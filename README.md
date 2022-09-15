@@ -2,7 +2,7 @@
 
 This repository contains the code for the MCU.
 
-# Building
+## Building
 
 Clone the Gecko SDK in the project root.
 

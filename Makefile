@@ -1,74 +1,96 @@
 ####################################################################
-# Makefile                                                         #
+# User Makefile                                                    #
+# This will not be overwritten. Edit as desired.                   #
 ####################################################################
-
 .SUFFIXES:				# ignore builtin rules
-.PHONY: all debug release clean flash rammeverk 
+.PHONY: all debug release clean
+
+# Default goal
+all: debug
 
 ####################################################################
 # Definitions                                                      #
 ####################################################################
 
-# notdirx: version of notdir which allows spaces in path
-s? = $(subst $(empty) ,?,$1)
-?s = $(subst ?, ,$1)
-notdirx = $(call ?s,$(notdir $(call s?,$1)))
+# Values set by the initial generation
+PROJECTNAME = mcu
+ARM_GCC_DIR_WIN = 
+ARM_GCC_DIR_OSX = /Applications/Simplicity Studio.app/Contents/Eclipse/developer/toolchains/gnu_arm/10.3_2021.10
+ARM_GCC_DIR_LINUX = 
 
-DEVICE = EFM32GG990F1024
-PROJECTNAME = $(call notdirx,$(CURDIR))
+# Pre-defined definitions in this file
+ifeq ($(OS),Windows_NT)
+  ARM_GCC_DIR ?= $(ARM_GCC_DIR_WIN)
+else
+  UNAME_S := $(shell uname -s)
+  ifeq ($(UNAME_S),Darwin)
+    ARM_GCC_DIR ?= $(ARM_GCC_DIR_OSX)
+  else
+    ARM_GCC_DIR ?= $(ARM_GCC_DIR_LINUX)
+  endif
+endif
 
-OBJ_DIR = build
-EXE_DIR = exe
+# Command output is hidden by default, it can be enabled by
+# setting VERBOSE=true on the commandline.
+ifeq ($(VERBOSE),)
+  ECHO = @
+endif
+
+# Build Directories
+BUILD_DIR = build
 LST_DIR = lst
 
+ifneq ($(filter $(MAKECMDGOALS),release),)
+  OUTPUT_DIR = $(BUILD_DIR)/release
+else
+  OUTPUT_DIR = $(BUILD_DIR)/debug
+endif
+
+# Values that should be appended by the sub-makefiles
+C_SOURCE_FILES   = 
+CXX_SOURCE_FILES = 
+ASM_SOURCE_FILES = 
+
+LIBS = 
+
+C_DEFS   = 
+ASM_DEFS = 
+
+INCLUDES = 
+
+C_FLAGS           = 
+C_FLAGS_DEBUG     = 
+C_FLAGS_RELEASE   = 
+CXX_FLAGS         = 
+CXX_FLAGS_DEBUG   = 
+CXX_FLAGS_RELEASE = 
+ASM_FLAGS         = 
+ASM_FLAGS_DEBUG   = 
+ASM_FLAGS_RELEASE = 
+LD_FLAGS          = 
+
+OBJS = 
 
 ####################################################################
 # Definitions of toolchain.                                        #
 # You might need to do changes to match your system setup          #
 ####################################################################
 
-RM         := rm -rf
-NULLDEVICE := /dev/null
-SHELLNAMES := $(ComSpec)$(COMSPEC)
+AR      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc-ar"
+CC      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc"
+CXX     = "$(ARM_GCC_DIR)/bin/arm-none-eabi-g++"
+OBJCOPY = "$(ARM_GCC_DIR)/bin/arm-none-eabi-objcopy"
+LD      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc"
 
-CC         := arm-none-eabi-gcc
-LD         := arm-none-eabi-ld
-AR         := arm-none-eabi-ar
-OBJCOPY    := arm-none-eabi-objcopy
-DUMP       := arm-none-eabi-objdump
-
-# Detect operating system
-ifeq ($(SHELLNAMES),)           # Linux
-  EACOM = /opt/SimplicityStudio_v3/bgtool/commander/commander
-else
-  EACOM = C:\SiliconLabs\SimplicityStudio\v3\bgtool\commander\commander.exe
-  ifneq ($(COMSPEC),)           # mingw/msys/cygwin platform running on Windows
-    ifeq ($(findstring cygdrive,$(shell set)),)
-      # We were not on a cygwin platform
-      NULLDEVICE := NUL
-    endif
-  else                          # Windows
-    NULLDEVICE := NUL
-  endif
-endif
-
-# Create directories and do a clean which is compatible with parallell make
-$(shell mkdir $(OBJ_DIR)>$(NULLDEVICE) 2>&1)
-$(shell mkdir $(EXE_DIR)>$(NULLDEVICE) 2>&1)
-$(shell mkdir $(LST_DIR)>$(NULLDEVICE) 2>&1)
-ifeq (clean,$(findstring clean, $(MAKECMDGOALS)))
-  ifneq ($(filter $(MAKECMDGOALS),all debug release),)
-    $(shell $(RM) $(OBJ_DIR)/*>$(NULLDEVICE) 2>&1)
-    $(shell $(RM) $(EXE_DIR)/*>$(NULLDEVICE) 2>&1)
-    $(shell $(RM) $(LST_DIR)/*>$(NULLDEVICE) 2>&1) #*/
-  endif
-endif
-
-
+####################################################################
+# Include sub-makefiles                                            #
+# Define a makefile here to add files/settings to the build.       #
+####################################################################
+-include mcu.project.mak
 
 
 ####################################################################
-# Flags                                                            #
+# Rules                                                            #
 ####################################################################
 
 # -MMD : Don't generate dependencies on system header files.
@@ -76,137 +98,93 @@ endif
 # -MF  : Specify a file to write the dependencies to.
 DEPFLAGS = -MMD -MP -MF $(@:.o=.d)
 
-#
-# Add -Wa,-ahld=$(LST_DIR)/$(@F:.o=.lst) to CFLAGS to produce assembly list files
-#
-override CFLAGS += -D$(DEVICE) -Wall -Wextra -mcpu=cortex-m3 -mthumb -ffunction-sections \
--fdata-sections -mfix-cortex-m3-ldrd -fomit-frame-pointer -DDEBUG_EFM       \
--O0 \
-$(DEPFLAGS)
+CSOURCES       = $(notdir $(C_SOURCE_FILES))
+CXXSOURCES     = $(notdir $(filter %.cpp, $(CXX_SOURCE_FILES)))
+CCSOURCES      = $(notdir $(filter %.cc, $(CXX_SOURCE_FILES)))
+ASMSOURCES_s   = $(notdir $(filter %.s, $(ASM_SOURCE_FILES)))
+ASMSOURCES_S   = $(notdir $(filter %.S, $(ASM_SOURCE_FILES)))
 
-ASMFLAGS += -x assembler-with-cpp -mcpu=cortex-m3 -mthumb
+COBJS       = $(addprefix $(OUTPUT_DIR)/,$(CSOURCES:.c=.o))
+CXXOBJS     = $(addprefix $(OUTPUT_DIR)/,$(CXXSOURCES:.cpp=.o))
+CCOBJS      = $(addprefix $(OUTPUT_DIR)/,$(CCSOURCES:.cc=.o))
+ASMOBJS_s   = $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_s:.s=.o))
+ASMOBJS_S   = $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_S:.S=.o))
+OBJS        += $(COBJS) $(CXXOBJS) $(CCOBJS) $(ASMOBJS_s) $(ASMOBJS_S)
 
-#
-# NOTE: The -Wl,--gc-sections flag may interfere with debugging using gdb.
-#
-override LDFLAGS += -Xlinker -Map=$(LST_DIR)/$(PROJECTNAME).map -mcpu=cortex-m3 \
--mthumb -Tefm32gg.ld --specs=nano.specs \
- -Wl,--gc-sections
+CDEPS       += $(addprefix $(OUTPUT_DIR)/,$(CSOURCES:.c=.d))
+CXXDEPS     += $(addprefix $(OUTPUT_DIR)/,$(CXXSOURCES:.cpp=.d))
+CXXDEPS     += $(addprefix $(OUTPUT_DIR)/,$(CCSOURCES:.cc=.d))
+ASMDEPS_s   += $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_s:.s=.d))
+ASMDEPS_S   += $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_S:.S=.d))
 
-LIBS = -Wl,--start-group -lgcc -lc -lnosys -Wl,--end-group
-
-INCLUDEPATHS += \
--I.. \
--I../common/CMSIS/Include \
--I../common/EFM32GG/Include \
--I../common/emlib/inc \
--I../common/EFM32/drivers \
--I../common/EFM32/bsp \
--I../common/EFM32GG_STK3700/config
-
-####################################################################
-# Files                                                            #
-####################################################################
-
-C_SRC +=  \
-../common/EFM32GG/Source/system_efm32gg.c \
-../common/EFM32/drivers/vddcheck.c \
-../common/EFM32/drivers/segmentlcd.c \
-../common/emlib/src/em_assert.c \
-../common/emlib/src/em_cmu.c \
-../common/emlib/src/em_emu.c \
-../common/emlib/src/em_gpio.c \
-../common/emlib/src/em_rtc.c \
-../common/emlib/src/em_system.c \
-../common/emlib/src/em_lcd.c \
-../common/emlib/src/em_vcmp.c \
-../common/emlib/src/em_usart.c \
-../common/EFM32/bsp/bsp_stk.c \
-../common/EFM32/bsp/bsp_stk_leds.c \
-../common/EFM32/bsp/bsp_trace.c \
-../common/$(PROJECTNAME)/init.c
-
-s_SRC +=  \
-../common/EFM32GG/Source/GCC/startup_efm32gg.s
-
-STUDENT_SRC += \
-$(PROJECTNAME).c
-
-####################################################################
-# Rules                                                            #
-####################################################################
-
-C_FILES = $(notdir $(C_SRC) )
-S_FILES = $(notdir $(S_SRC) $(s_SRC) )
-#make list of source paths, sort also removes duplicates
-C_PATHS = $(sort $(dir $(C_SRC) ) )
-S_PATHS = $(sort $(dir $(S_SRC) $(s_SRC) ) )
-
-C_OBJS = $(addprefix $(OBJ_DIR)/, $(C_FILES:.c=.o))
-S_OBJS = $(if $(S_SRC), $(addprefix $(OBJ_DIR)/, $(S_FILES:.S=.o)))
-s_OBJS = $(if $(s_SRC), $(addprefix $(OBJ_DIR)/, $(S_FILES:.s=.o)))
-C_DEPS = $(addprefix $(OBJ_DIR)/, $(C_FILES:.c=.d))
-OBJS = $(C_OBJS) $(S_OBJS) $(s_OBJS)
-STUDENT_OBJS = $(addprefix $(OBJ_DIR)/, $(STUDENT_SRC:.c=.o))
+C_PATHS   = $(subst \,/,$(sort $(dir $(C_SOURCE_FILES))))
+CXX_PATHS = $(subst \,/,$(sort $(dir $(CXX_SOURCE_FILES))))
+ASM_PATHS = $(subst \,/,$(sort $(dir $(ASM_SOURCE_FILES))))
 
 vpath %.c $(C_PATHS)
-vpath %.s $(S_PATHS)
-vpath %.S $(S_PATHS)
+vpath %.cpp $(CXX_PATHS)
+vpath %.cc $(CXX_PATHS)
+vpath %.s $(ASM_PATHS)
+vpath %.S $(ASM_PATHS)
 
+override CFLAGS = $(C_FLAGS) $(C_DEFS) $(INCLUDES) $(DEPFLAGS)
+override CXXFLAGS = $(CXX_FLAGS) $(C_DEFS) $(INCLUDES) $(DEPFLAGS)
+override ASMFLAGS = $(ASM_FLAGS) $(ASM_DEFS) $(INCLUDES) $(DEPFLAGS)
 
-# Default build is debug build
-all:      debug
+# Rule Definitions
+debug: C_FLAGS += $(C_FLAGS_DEBUG) 
+debug: CXX_FLAGS += $(CXX_FLAGS_DEBUG)
+debug: ASM_FLAGS += $(ASM_FLAGS_DEBUG)
+debug: $(OUTPUT_DIR)/$(PROJECTNAME).out
 
-debug:    CFLAGS += -DDEBUG -O0 -g3
-debug:    $(EXE_DIR)/$(PROJECTNAME).bin
-
-release:  CFLAGS += -DNDEBUG -O3 -g3 
-release:  $(EXE_DIR)/$(PROJECTNAME).bin
-
-rammeverk:  $(OBJS)
-
-# Create objects from C SRC files
-$(OBJ_DIR)/%.o: %.c
-	@echo "Building file: $<"
-	$(CC) $(CFLAGS) $(INCLUDEPATHS) -c -o $@ $<
-
-# Assemble .s/.S files
-$(OBJ_DIR)/%.o: %.s
-	@echo "Assembling $<"
-	$(CC) $(ASMFLAGS) $(INCLUDEPATHS) -c -o $@ $<
-
-$(OBJ_DIR)/%.o: %.S
-	@echo "Assembling $<"
-	$(CC) $(ASMFLAGS) $(INCLUDEPATHS) -c -o $@ $<
-
-# Link
-$(EXE_DIR)/$(PROJECTNAME).out: $(STUDENT_OBJS) 
-	@echo "Linking target: $@"
-	$(CC) $(LDFLAGS) $(OBJS) $(STUDENT_OBJS) $(LIBS) -o $(EXE_DIR)/$(PROJECTNAME).out
-
-# Create binary file
-$(EXE_DIR)/$(PROJECTNAME).bin: $(EXE_DIR)/$(PROJECTNAME).out
-	@echo "Creating binary file"
-	$(OBJCOPY) -O binary $(EXE_DIR)/$(PROJECTNAME).out $(EXE_DIR)/$(PROJECTNAME).bin
-# Uncomment next line to produce assembly listing of entire program
-#	$(DUMP) -h -S -C $(EXE_DIR)/$(PROJECTNAME).out>$(LST_DIR)/$(PROJECTNAME)out.lst
-
-# Flash on!
-ifeq ($(f), 1)
-	$(EACOM) flash $(EXE_DIR)/$(PROJECTNAME).bin
-endif
-
-clean:
-ifeq ($(filter $(MAKECMDGOALS),all debug release),)
-	$(RM) $(LST_DIR) $(EXE_DIR)
-	$(RM) $(STUDENT_OBJS)
-endif
+release: C_FLAGS += $(C_FLAGS_RELEASE) 
+release: CXX_FLAGS += $(CXX_FLAGS_RELEASE)
+release: ASM_FLAGS += $(ASM_FLAGS_RELEASE)
+release: $(OUTPUT_DIR)/$(PROJECTNAME).out
 
 # include auto-generated dependency files (explicit rules)
 ifneq (clean,$(findstring clean, $(MAKECMDGOALS)))
--include $(C_DEPS)
+-include $(CDEPS)
+-include $(CXXDEPS)
+-include $(ASMDEPS_s)
+-include $(ASMDEPS_S)
 endif
 
-flash:
-	$(EACOM) flash $(EXE_DIR)/$(PROJECTNAME).bin
-	@echo "Completed!"
+$(OUTPUT_DIR)/$(PROJECTNAME).out: $(OBJS) $(LIB_FILES)
+	@echo 'Linking $(OUTPUT_DIR)/$(PROJECTNAME).out'
+	@echo $(OBJS) > $(OUTPUT_DIR)/linker_objs
+	$(ECHO)$(LD) $(LD_FLAGS) @$(OUTPUT_DIR)/linker_objs $(LIBS) -o $(OUTPUT_DIR)/$(PROJECTNAME).out
+	$(ECHO)$(OBJCOPY) $(OUTPUT_DIR)/$(PROJECTNAME).out -O binary $(OUTPUT_DIR)/$(PROJECTNAME).bin
+	$(ECHO)$(OBJCOPY) $(OUTPUT_DIR)/$(PROJECTNAME).out -O ihex $(OUTPUT_DIR)/$(PROJECTNAME).hex
+	$(ECHO)$(OBJCOPY) $(OUTPUT_DIR)/$(PROJECTNAME).out -O srec $(OUTPUT_DIR)/$(PROJECTNAME).s37
+	@echo 'Done.'
+
+$(OBJS):
+
+$(OUTPUT_DIR)/%.o: %.c
+	@echo 'Building $<'
+	@mkdir -p $(@D)
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $<
+
+$(OUTPUT_DIR)/%.o: %.cpp
+	@echo 'Building $<'
+	@mkdir -p $(@D)
+	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OUTPUT_DIR)/%.o: %.cc
+	@echo 'Building $<'
+	@mkdir -p $(@D)
+	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OUTPUT_DIR)/%.o: %.s
+	@echo 'Building $<'
+	@mkdir -p $(@D)
+	$(ECHO)$(CC) $(ASMFLAGS) -c -o $@ $<
+
+$(OUTPUT_DIR)/%.o: %.S
+	@echo 'Building $<'
+	@mkdir -p $(@D)
+	$(ECHO)$(CC) $(ASMFLAGS) -c -o $@ $<
+
+clean:
+	$(RM) -rf $(BUILD_DIR)

@@ -20,3 +20,8 @@ Then compile the project using the Makefile:
 ```
 $ make
 ```
+
+## Flashing
+
+Download J-Link [from here](https://www.segger.com/downloads/jlink/) and use J-Flash (Lite?)
+to program the MCU.

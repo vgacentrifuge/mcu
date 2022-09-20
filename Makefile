@@ -14,21 +14,6 @@ all: debug
 
 # Values set by the initial generation
 PROJECTNAME = mcu
-ARM_GCC_DIR_WIN = 
-ARM_GCC_DIR_OSX = /Applications/Simplicity Studio.app/Contents/Eclipse/developer/toolchains/gnu_arm/10.3_2021.10
-ARM_GCC_DIR_LINUX = 
-
-# Pre-defined definitions in this file
-ifeq ($(OS),Windows_NT)
-  ARM_GCC_DIR ?= $(ARM_GCC_DIR_WIN)
-else
-  UNAME_S := $(shell uname -s)
-  ifeq ($(UNAME_S),Darwin)
-    ARM_GCC_DIR ?= $(ARM_GCC_DIR_OSX)
-  else
-    ARM_GCC_DIR ?= $(ARM_GCC_DIR_LINUX)
-  endif
-endif
 
 # Command output is hidden by default, it can be enabled by
 # setting VERBOSE=true on the commandline.
@@ -46,28 +31,74 @@ else
   OUTPUT_DIR = $(BUILD_DIR)/debug
 endif
 
-# Values that should be appended by the sub-makefiles
-C_SOURCE_FILES   = 
-CXX_SOURCE_FILES = 
-ASM_SOURCE_FILES = 
+SDK_PATH = gecko_sdk
 
-LIBS = 
+LIBS = \
+ -Wl,--start-group \
+ -lgcc \
+ -lc \
+ -lm \
+ -lnosys \
+ -Wl,--end-group
 
-C_DEFS   = 
-ASM_DEFS = 
+C_DEFS   = \
+ '-DDEBUG_EFM=1' \
+ '-DEFM32GG990F1024=1' \
+ '-DSL_BOARD_NAME="BRD2200A"' \
+ '-DSL_BOARD_REV="B05"'
+ASM_DEFS = \
+ '-DDEBUG_EFM=1' \
+ '-DEFM32GG990F1024=1' \
+ '-DSL_BOARD_NAME="BRD2200A"' \
+ '-DSL_BOARD_REV="B05"'
 
-INCLUDES = 
+INCLUDES = \
+ -Iconfig \
+ -Iautogen \
+ -Iinc \
+ -I$(SDK_PATH)/platform/Device/SiliconLabs/EFM32GG/Include \
+ -I$(SDK_PATH)/platform/common/inc \
+ -I$(SDK_PATH)/hardware/board/inc \
+ -I$(SDK_PATH)/platform/CMSIS/Core/Include \
+ -I$(SDK_PATH)/platform/service/device_init/inc \
+ -I$(SDK_PATH)/platform/emdrv/common/inc \
+ -I$(SDK_PATH)/platform/emdrv/dmadrv/inc \
+ -I$(SDK_PATH)/platform/emdrv/spidrv/inc \
+ -I$(SDK_PATH)/platform/emlib/inc \
+ -I$(SDK_PATH)/platform/driver/leddrv/inc \
+ -I$(SDK_PATH)/platform/common/toolchain/inc \
+ -I$(SDK_PATH)/platform/service/system/inc \
+ -I$(SDK_PATH)/platform/service/sleeptimer/inc
 
-C_FLAGS           = 
+C_FLAGS           = \
+ -mcpu=cortex-m3 \
+ -mthumb \
+ -std=c99 \
+ -Wall \
+ -Wextra \
+ -Os \
+ -fdata-sections \
+ -ffunction-sections \
+ -fomit-frame-pointer \
+ -imacros sl_gcc_preinclude.h \
+ --specs=nano.specs \
+ -g
 C_FLAGS_DEBUG     = 
 C_FLAGS_RELEASE   = 
-CXX_FLAGS         = 
-CXX_FLAGS_DEBUG   = 
-CXX_FLAGS_RELEASE = 
-ASM_FLAGS         = 
+ASM_FLAGS         = \
+ -mcpu=cortex-m3 \
+ -mthumb \
+ -imacros sl_gcc_preinclude.h \
+ -x assembler-with-cpp
 ASM_FLAGS_DEBUG   = 
 ASM_FLAGS_RELEASE = 
-LD_FLAGS          = 
+LD_FLAGS          = \
+ -mcpu=cortex-m3 \
+ -mthumb \
+ -T"autogen/linkerfile.ld" \
+ --specs=nano.specs \
+ -Xlinker -Map=$(OUTPUT_DIR)/$(PROJECTNAME).map \
+ -Wl,--gc-sections
 
 OBJS = 
 
@@ -76,18 +107,10 @@ OBJS =
 # You might need to do changes to match your system setup          #
 ####################################################################
 
-AR      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc-ar"
-CC      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc"
-CXX     = "$(ARM_GCC_DIR)/bin/arm-none-eabi-g++"
-OBJCOPY = "$(ARM_GCC_DIR)/bin/arm-none-eabi-objcopy"
-LD      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc"
-
-####################################################################
-# Include sub-makefiles                                            #
-# Define a makefile here to add files/settings to the build.       #
-####################################################################
--include mcu.project.mak
-
+AR      = "arm-none-eabi-gcc-ar"
+CC      = "arm-none-eabi-gcc"
+OBJCOPY = "arm-none-eabi-objcopy"
+LD      = "arm-none-eabi-gcc"
 
 ####################################################################
 # Rules                                                            #
@@ -98,56 +121,64 @@ LD      = "$(ARM_GCC_DIR)/bin/arm-none-eabi-gcc"
 # -MF  : Specify a file to write the dependencies to.
 DEPFLAGS = -MMD -MP -MF $(@:.o=.d)
 
-CSOURCES       = $(notdir $(C_SOURCE_FILES))
-CXXSOURCES     = $(notdir $(filter %.cpp, $(CXX_SOURCE_FILES)))
-CCSOURCES      = $(notdir $(filter %.cc, $(CXX_SOURCE_FILES)))
-ASMSOURCES_s   = $(notdir $(filter %.s, $(ASM_SOURCE_FILES)))
-ASMSOURCES_S   = $(notdir $(filter %.S, $(ASM_SOURCE_FILES)))
+C_SRC = \
+ $(wildcard src/*.c) \
+ $(wildcard autogen/*.c) \
+ $(wildcard config/*.c)
+GECKO_C_SRC = \
+ $(SDK_PATH)/hardware/board/src/sl_board_control_gpio.c \
+ $(SDK_PATH)/hardware/board/src/sl_board_init.c \
+ $(wildcard $(SDK_PATH)/platform/emdrv/dmadrv/src/*.c) \
+ $(SDK_PATH)/platform/emdrv/spidrv/src/spidrv.c \
+ $(wildcard $(SDK_PATH)/platform/emlib/src/*.c) \
+ $(SDK_PATH)/platform/common/src/sl_assert.c \
+ $(SDK_PATH)/platform/common/toolchain/src/sl_memory.c \
+ $(SDK_PATH)/platform/driver/leddrv/src/sl_simple_led.c \
+ $(SDK_PATH)/platform/driver/leddrv/src/sl_led.c \
+ $(SDK_PATH)/platform/service/device_init/src/sl_device_init_emu_s0.c \
+ $(SDK_PATH)/platform/service/device_init/src/sl_device_init_hfxo_s0.c \
+ $(SDK_PATH)/platform/service/device_init/src/sl_device_init_lfxo_s0.c \
+ $(SDK_PATH)/platform/service/device_init/src/sl_device_init_nvic.c \
+ $(SDK_PATH)/platform/service/sleeptimer/src/sl_sleeptimer.c \
+ $(SDK_PATH)/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtc.c \
+ $(SDK_PATH)/platform/service/system/src/sl_system_init.c \
+ $(SDK_PATH)/platform/service/system/src/sl_system_process_action.c \
+ $(wildcard $(SDK_PATH)/platform/Device/SiliconLabs/EFM32GG/Source/*.c)
+CSOURCES = $(C_SRC) $(GECKO_C_SRC)
+
+#GECKO_A_SRC = $(SDK_PATH)/platform/Device/SiliconLabs/EFM32GG/Source/GCC/startup_efm32gg.S
+ASMSOURCES  = #$(GECKO_A_SRC)
 
 COBJS       = $(addprefix $(OUTPUT_DIR)/,$(CSOURCES:.c=.o))
-CXXOBJS     = $(addprefix $(OUTPUT_DIR)/,$(CXXSOURCES:.cpp=.o))
-CCOBJS      = $(addprefix $(OUTPUT_DIR)/,$(CCSOURCES:.cc=.o))
-ASMOBJS_s   = $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_s:.s=.o))
-ASMOBJS_S   = $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_S:.S=.o))
-OBJS        += $(COBJS) $(CXXOBJS) $(CCOBJS) $(ASMOBJS_s) $(ASMOBJS_S)
+ASMOBJS     = $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES:.S=.o))
+OBJS        += $(COBJS) $(ASMOBJS)
 
 CDEPS       += $(addprefix $(OUTPUT_DIR)/,$(CSOURCES:.c=.d))
-CXXDEPS     += $(addprefix $(OUTPUT_DIR)/,$(CXXSOURCES:.cpp=.d))
-CXXDEPS     += $(addprefix $(OUTPUT_DIR)/,$(CCSOURCES:.cc=.d))
-ASMDEPS_s   += $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_s:.s=.d))
-ASMDEPS_S   += $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES_S:.S=.d))
+ASMDEPS     += $(addprefix $(OUTPUT_DIR)/,$(ASMSOURCES:.S=.d))
 
-C_PATHS   = $(subst \,/,$(sort $(dir $(C_SOURCE_FILES))))
-CXX_PATHS = $(subst \,/,$(sort $(dir $(CXX_SOURCE_FILES))))
-ASM_PATHS = $(subst \,/,$(sort $(dir $(ASM_SOURCE_FILES))))
+#C_PATHS   = $(subst \,/,$(sort $(dir $(C_SOURCE_FILES))))
+#ASM_PATHS = $(subst \,/,$(sort $(dir $(ASM_SOURCE_FILES))))
 
-vpath %.c $(C_PATHS)
-vpath %.cpp $(CXX_PATHS)
-vpath %.cc $(CXX_PATHS)
-vpath %.s $(ASM_PATHS)
-vpath %.S $(ASM_PATHS)
+#vpath %.c $(C_PATHS)
+#vpath %.s $(ASM_PATHS)
+#vpath %.S $(ASM_PATHS)
 
 override CFLAGS = $(C_FLAGS) $(C_DEFS) $(INCLUDES) $(DEPFLAGS)
-override CXXFLAGS = $(CXX_FLAGS) $(C_DEFS) $(INCLUDES) $(DEPFLAGS)
 override ASMFLAGS = $(ASM_FLAGS) $(ASM_DEFS) $(INCLUDES) $(DEPFLAGS)
 
 # Rule Definitions
 debug: C_FLAGS += $(C_FLAGS_DEBUG) 
-debug: CXX_FLAGS += $(CXX_FLAGS_DEBUG)
 debug: ASM_FLAGS += $(ASM_FLAGS_DEBUG)
 debug: $(OUTPUT_DIR)/$(PROJECTNAME).out
 
 release: C_FLAGS += $(C_FLAGS_RELEASE) 
-release: CXX_FLAGS += $(CXX_FLAGS_RELEASE)
 release: ASM_FLAGS += $(ASM_FLAGS_RELEASE)
 release: $(OUTPUT_DIR)/$(PROJECTNAME).out
 
 # include auto-generated dependency files (explicit rules)
 ifneq (clean,$(findstring clean, $(MAKECMDGOALS)))
 -include $(CDEPS)
--include $(CXXDEPS)
--include $(ASMDEPS_s)
--include $(ASMDEPS_S)
+-include $(ASMDEPS)
 endif
 
 $(OUTPUT_DIR)/$(PROJECTNAME).out: $(OBJS) $(LIB_FILES)
@@ -165,21 +196,6 @@ $(OUTPUT_DIR)/%.o: %.c
 	@echo 'Building $<'
 	@mkdir -p $(@D)
 	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $<
-
-$(OUTPUT_DIR)/%.o: %.cpp
-	@echo 'Building $<'
-	@mkdir -p $(@D)
-	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OUTPUT_DIR)/%.o: %.cc
-	@echo 'Building $<'
-	@mkdir -p $(@D)
-	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OUTPUT_DIR)/%.o: %.s
-	@echo 'Building $<'
-	@mkdir -p $(@D)
-	$(ECHO)$(CC) $(ASMFLAGS) -c -o $@ $<
 
 $(OUTPUT_DIR)/%.o: %.S
 	@echo 'Building $<'

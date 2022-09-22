@@ -2,6 +2,6 @@
 .pdm/
 .settings/
 build/
-gecko_sdk/
+gecko_sdk_*.*.*/
 GNU ARM v*.*.* - *
 lst/

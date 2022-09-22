@@ -1,3 +1,6 @@
+.cproject
+.pdm/
+.settings/
 build/
 gecko_sdk/
 lst/

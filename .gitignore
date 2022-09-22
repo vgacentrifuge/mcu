@@ -3,4 +3,5 @@
 .settings/
 build/
 gecko_sdk/
+GNU ARM v*.*.* - *
 lst/

@@ -1,4 +1,5 @@
 #CRC Codes for initially generated config files -- do not modify!
+dmadrv_config.h=-1131831653
 emlib_core_debug_config.h=171843933
 sl_board_control_config.h=622062623
 sl_device_init_hfxo_config.h=-1774902859
@@ -6,3 +7,6 @@ sl_device_init_lfxo_config.h=1460862873
 sl_memory_config.h=-995392215
 sl_simple_led_led0_config.h=-219882604
 sl_sleeptimer_config.h=-1074849105
+sl_spidrv_exp_config.h=1825569485
+sl_spidrv_sd_card_config.h=-194625532
+spidrv_config.h=112055036

@@ -21,31 +21,34 @@
 #endif
 #include "sl_system_process_action.h"
 #include "blink.h"
+#include "sd_card.h"
 #include "debug.h"
+#include "sl_sleeptimer.h"
 
-int main(void)
-{
-  // Initialize Silicon Labs device, system, service(s) and protocol stack(s).
-  // Note that if the kernel is present, processing task(s) will be created by
-  // this call.
-  sl_system_init();
+int main(void) {
+    // Initialize Silicon Labs device, system, service(s) and protocol stack(s).
+    // Note that if the kernel is present, processing task(s) will be created by
+    // this call.
+    sl_system_init();
 
-  blink_init();
+    blink_init();
 
-  debug_init();
+    debug_init();
 
-  while (1) {
-    // Do not remove this call: Silicon Labs components process action routine
-    // must be called from the super loop.
-    sl_system_process_action();
+    sl_sleeptimer_delay_millisecond(5000);
+    sd_card_init();
+    sd_card_test();
 
-    blink_process_action();
+    while (1) {
+        // Do not remove this call: Silicon Labs components process action routine
+        // must be called from the super loop.
+        sl_system_process_action();
 
-    debug_send_string("foo\n");
+        blink_process_action();
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     // Let the CPU go to sleep if the system allows it.
     sl_power_manager_sleep();
 #endif
-  }
+    }
 }

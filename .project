@@ -71,6 +71,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/common/inc/sl_enum.h</locationURI>
 		</link>
 		<link>
+			<name>gecko_sdk_4.1.1/platform/common/inc/sl_slist.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/common/inc/sl_slist.h</locationURI>
+		</link>
+		<link>
 			<name>gecko_sdk_4.1.1/platform/common/inc/sl_status.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/common/inc/sl_status.h</locationURI>
@@ -79,6 +84,11 @@
 			<name>gecko_sdk_4.1.1/platform/common/src/sl_assert.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/common/src/sl_assert.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/common/src/sl_slist.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/common/src/sl_slist.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_assert.h</name>
@@ -121,6 +131,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_core.h</locationURI>
 		</link>
 		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_dma.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_dma.h</locationURI>
+		</link>
+		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_emu.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_emu.h</locationURI>
@@ -156,6 +171,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_system.h</locationURI>
 		</link>
 		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_usart.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_usart.h</locationURI>
+		</link>
+		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_version.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_version.h</locationURI>
@@ -174,6 +194,11 @@
 			<name>gecko_sdk_4.1.1/platform/emlib/src/em_core.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_core.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/src/em_dma.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_dma.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/src/em_emu.c</name>
@@ -199,6 +224,11 @@
 			<name>gecko_sdk_4.1.1/platform/emlib/src/em_system.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_system.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/src/em_usart.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_usart.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/CMSIS/Core/Include/cmsis_compiler.h</name>
@@ -269,6 +299,41 @@
 			<name>gecko_sdk_4.1.1/platform/driver/leddrv/src/sl_simple_led.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/src/sl_simple_led.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/common/inc/ecode.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/common/inc/ecode.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/dmadrv/inc/dmactrl.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/inc/dmactrl.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/dmadrv/inc/dmadrv.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/inc/dmadrv.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/dmadrv/src/dmactrl.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/src/dmactrl.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/dmadrv/src/dmadrv.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/src/dmadrv.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/spidrv/inc/spidrv.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/spidrv/inc/spidrv.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emdrv/spidrv/src/spidrv.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/spidrv/src/spidrv.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/service/device_init/inc/sl_device_init_clocks.h</name>

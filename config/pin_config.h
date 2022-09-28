@@ -101,6 +101,23 @@
 // [USART0]$
 
 // $[USART1]
+// USART1 CLK on PD2
+#define USART1_CLK_PORT                          gpioPortD
+#define USART1_CLK_PIN                           2
+#define USART1_ROUTE_LOC                         1
+
+// USART1 CS on PD3
+#define USART1_CS_PORT                           gpioPortD
+#define USART1_CS_PIN                            3
+
+// USART1 RX on PD1
+#define USART1_RX_PORT                           gpioPortD
+#define USART1_RX_PIN                            1
+
+// USART1 TX on PD0
+#define USART1_TX_PORT                           gpioPortD
+#define USART1_TX_PIN                            0
+
 // [USART1]$
 
 // $[USART2]

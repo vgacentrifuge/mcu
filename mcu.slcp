@@ -16,15 +16,10 @@ quality: production
 readme:
 - {path: readme.md}
 source:
-- {path: app.c}
-- {path: main.c}
-- {path: blink.c}
+- {path: src}
 tag: ['hardware:component:led:1+']
 include:
-- path: ''
-  file_list:
-  - {path: app.h}
-  - {path: blink.h}
+- path: 'inc'
 sdk: {id: gecko_sdk, version: 4.1.1}
 toolchain_settings: []
 component:
@@ -32,6 +27,8 @@ component:
   id: simple_led
 - {id: sl_system}
 - {id: device_init}
+- instance: [sd_card]
+  id: spidrv
 - {id: sleeptimer}
 - {id: brd2200a}
 - {id: EFM32GG990F1024}

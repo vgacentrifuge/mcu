@@ -28,6 +28,7 @@ include:
 sdk: {id: gecko_sdk, version: 4.1.1}
 toolchain_settings: []
 component:
+- {id: emlib_i2c}
 - instance: [led0]
   id: simple_led
 - {id: sl_system}

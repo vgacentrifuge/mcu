@@ -143,6 +143,7 @@
           <file name="em_core.c" uri="studio:/sdk/platform/emlib/src/em_core.c"/>
           <file name="em_emu.c" uri="studio:/sdk/platform/emlib/src/em_emu.c"/>
           <file name="em_gpio.c" uri="studio:/sdk/platform/emlib/src/em_gpio.c"/>
+          <file name="em_i2c.c" uri="studio:/sdk/platform/emlib/src/em_i2c.c"/>
           <file name="em_msc.c" uri="studio:/sdk/platform/emlib/src/em_msc.c"/>
           <file name="em_rtc.c" uri="studio:/sdk/platform/emlib/src/em_rtc.c"/>
           <file name="em_system.c" uri="studio:/sdk/platform/emlib/src/em_system.c"/>
@@ -160,6 +161,7 @@
           <file name="em_core.h" uri="studio:/sdk/platform/emlib/inc/em_core.h"/>
           <file name="em_emu.h" uri="studio:/sdk/platform/emlib/inc/em_emu.h"/>
           <file name="em_gpio.h" uri="studio:/sdk/platform/emlib/inc/em_gpio.h"/>
+          <file name="em_i2c.h" uri="studio:/sdk/platform/emlib/inc/em_i2c.h"/>
           <file name="em_msc.h" uri="studio:/sdk/platform/emlib/inc/em_msc.h"/>
           <file name="em_msc_compat.h" uri="studio:/sdk/platform/emlib/inc/em_msc_compat.h"/>
           <file name="em_rtc.h" uri="studio:/sdk/platform/emlib/inc/em_rtc.h"/>
@@ -192,9 +194,6 @@
       </folder>
     </folder>
   </folder>
-  <file name="app.c" linked="false" uri="studio:/project/app.c"/>
-  <file name="main.c" linked="false" uri="studio:/project/main.c"/>
-  <file name="blink.c" linked="false" uri="studio:/project/blink.c"/>
   <file name="app.h" linked="false" uri="studio:/project/app.h"/>
   <file name="blink.h" linked="false" uri="studio:/project/blink.h"/>
   <file name="readme.md" linked="false" uri="studio:/project/readme.md"/>

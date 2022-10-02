@@ -1,0 +1,9 @@
+{
+  "files.associations": {
+    "*.sql": "sql",
+    "em_cmu.h": "c",
+    "em_device.h": "c",
+    "em_gpio.h": "c",
+    "sl_simple_led.h": "c"
+  }
+}

@@ -20,8 +20,23 @@
 #include "sl_power_manager.h"
 #endif
 #include "sl_system_process_action.h"
+#include <stdbool.h>
+
+
 #include "blink.h"
+#include "gpio.h"
 #include "debug.h"
+
+volatile bool can_press = false;
+
+void btn_handler( char* message) {
+  GPIO_IntClear(0xFFFF);
+  debug_send_string(message);
+}
+
+void GPIO_EVEN_IRQHandler(void) { btn_handler("Hello from even\n"); }
+
+void GPIO_ODD_IRQHandler(void) { btn_handler("Hello from odd\n"); }
 
 int main(void)
 {
@@ -34,18 +49,25 @@ int main(void)
 
   debug_init();
 
-  while (1) {
-    // Do not remove this call: Silicon Labs components process action routine
-    // must be called from the super loop.
-    sl_system_process_action();
+  initGPIO();
 
-    blink_process_action();
+  while (true) {}
 
-    debug_send_string("foo\n");
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    // Let the CPU go to sleep if the system allows it.
-    sl_power_manager_sleep();
-#endif
-  }
+//  while (1) {
+//    // Do not remove this call: Silicon Labs components process action routine
+//    // must be called from the super loop.
+//    sl_system_process_action();
+//
+//    //    bool button1 = GPIO_PinInGet(BUTTON_PORT, BUTTON_PIN);
+//    //    bool button2 = GPIO_PinInGet(BUTTON_2_PORT, BUTTON_2_PIN);
+//    //
+//    //    if (button1 == 0) blink_process_action();
+//    //    if (button2 == 0) debug_send_string("foo\n");
+//
+//
+//#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+//    // Let the CPU go to sleep if the system allows it.
+//    sl_power_manager_sleep();
+//#endif
+//  }
 }

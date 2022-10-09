@@ -24,6 +24,7 @@
 #include "blink.h"
 #include "debug.h"
 #include "gpio.h"
+#include "i2c.h"
 
 void btn_handler( char* message) {
   GPIO_IntClear(0xFFFF);
@@ -41,6 +42,7 @@ int main(void)
   sl_system_init();
   debug_init();
   initGPIO();
+  initI2C();
 
   while (1) {}
 }

@@ -20,8 +20,18 @@
 #include "sl_power_manager.h"
 #endif
 #include "sl_system_process_action.h"
+
 #include "blink.h"
 #include "debug.h"
+#include "gpio.h"
+
+void btn_handler( char* message) {
+  GPIO_IntClear(0xFFFF);
+  debug_send_string(message);
+}
+
+void GPIO_EVEN_IRQHandler(void) { btn_handler("Hello from even\n"); }
+void GPIO_ODD_IRQHandler(void)  { btn_handler("Hello from odd\n");  }
 
 int main(void)
 {
@@ -29,23 +39,8 @@ int main(void)
   // Note that if the kernel is present, processing task(s) will be created by
   // this call.
   sl_system_init();
-
-  blink_init();
-
   debug_init();
+  initGPIO();
 
-  while (1) {
-    // Do not remove this call: Silicon Labs components process action routine
-    // must be called from the super loop.
-    sl_system_process_action();
-
-    blink_process_action();
-
-    debug_send_string("foo\n");
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    // Let the CPU go to sleep if the system allows it.
-    sl_power_manager_sleep();
-#endif
-  }
+  while (1) {}
 }

@@ -1,3 +1,5 @@
+.uceditor/
+.projectlinkstore
 build/
 gecko_sdk_*.*.*/
 GNU ARM v*.*.* - *

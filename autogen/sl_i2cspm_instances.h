@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file
- * @brief LED Driver Instances
+ * @brief I2C simple poll-based master mode driver instances
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * The licensor of this software is Silicon Laboratories Inc. Your use of this
@@ -14,19 +14,26 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+ 
+#ifndef SL_I2CSPM_INSTANCES_H
+#define SL_I2CSPM_INSTANCES_H
 
-#ifndef SL_SIMPLE_LED_INSTANCES_H
-#define SL_SIMPLE_LED_INSTANCES_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "sl_simple_led.h"
+#include "sl_i2cspm.h"
 
-extern const sl_led_t sl_led_led0;
 
-extern const sl_led_t *sl_simple_led_array[];
+#define SL_I2CSPM_I2C1_PRESENT
 
-#define SL_SIMPLE_LED_COUNT 1
-#define SL_SIMPLE_LED_INSTANCE(n) (sl_simple_led_array[n])
 
-void sl_simple_led_init_instances(void);
+extern sl_i2cspm_t *sl_i2cspm_i2c1;
 
-#endif // SL_SIMPLE_LED_INIT_H
+void sl_i2cspm_init_instances(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // SL_I2CSPM_INSTANCES_H

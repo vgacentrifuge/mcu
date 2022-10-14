@@ -20,6 +20,11 @@
 // [DAC0]$
 
 // $[DBG]
+// DBG SWO on PF2
+#define DBG_SWO_PORT                             gpioPortF
+#define DBG_SWO_PIN                              2
+#define DBG_ROUTE_LOC                            0
+
 // [DBG]$
 
 // $[EBI]
@@ -38,6 +43,15 @@
 // [I2C0]$
 
 // $[I2C1]
+// I2C1 SCL on PC5
+#define I2C1_SCL_PORT                            gpioPortC
+#define I2C1_SCL_PIN                             5
+#define I2C1_ROUTE_LOC                           0
+
+// I2C1 SDA on PC4
+#define I2C1_SDA_PORT                            gpioPortC
+#define I2C1_SDA_PIN                             4
+
 // [I2C1]$
 
 // $[LCD]

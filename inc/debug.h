@@ -1,15 +1,9 @@
-/*
- * debug.h
- *
- *  Created on: 28. sep. 2022
- *      Author: amatho
- */
+/***************************************************************************//**
+ * @file
+ * @brief Debugging helpers
+ ******************************************************************************/
 
-#ifndef INC_DEBUG_H_
-#define INC_DEBUG_H_
+#pragma once
 
-void debug_init(void);
-
-void debug_send_string(char *);
-
-#endif /* INC_DEBUG_H_ */
+void debug_print(char* str);
+void debug_println(char* str);

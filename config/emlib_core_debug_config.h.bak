@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file
- * @brief Board Control
+ * @brief emlib_core Configuration
  *******************************************************************************
  * # License
- * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -28,23 +28,19 @@
  *
  ******************************************************************************/
 
-#ifndef SL_BOARD_CONTROL_CONFIG_H
-#define SL_BOARD_CONTROL_CONFIG_H
+#ifndef EM_CORE_DEBUG_CONFIG_H
+#define EM_CORE_DEBUG_CONFIG_H
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
-// <q SL_BOARD_ENABLE_VCOM> Enable Virtual COM UART
+// <h> Core Configuration
+
+// <q SL_EMLIB_CORE_ENABLE_INTERRUPT_DISABLED_TIMING> Enables measuring of interrupt disable time for debugging purposes.
 // <i> Default: 0
-#define SL_BOARD_ENABLE_VCOM                    0
+// <i> If Enabled, either cycle_counter or systemview component must be added to project.
+#define SL_EMLIB_CORE_ENABLE_INTERRUPT_DISABLED_TIMING    0
+
+// </h>
 
 // <<< end of configuration section >>>
-
-// <<< sl:start pin_tool >>>
-
-// <gpio> SL_BOARD_ENABLE_VCOM
-// $[GPIO_SL_BOARD_ENABLE_VCOM]
-// [GPIO_SL_BOARD_ENABLE_VCOM]$
-
-// <<< sl:end pin_tool >>>
-
-#endif // SL_BOARD_CONTROL_CONFIG_H
+#endif // EM_CORE_CONFIG_H

@@ -7,3 +7,4 @@
 
 void debug_print(char* str);
 void debug_println(char* str);
+void debug_printintln(int i);

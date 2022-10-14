@@ -112,9 +112,43 @@
 // [UART1]$
 
 // $[USART0]
+// USART0 CLK on PE5
+#define USART0_CLK_PORT                          gpioPortE
+#define USART0_CLK_PIN                           5
+#define USART0_ROUTE_LOC                         1
+
+// USART0 CS on PE4
+#define USART0_CS_PORT                           gpioPortE
+#define USART0_CS_PIN                            4
+
+// USART0 RX on PE6
+#define USART0_RX_PORT                           gpioPortE
+#define USART0_RX_PIN                            6
+
+// USART0 TX on PE7
+#define USART0_TX_PORT                           gpioPortE
+#define USART0_TX_PIN                            7
+
 // [USART0]$
 
 // $[USART1]
+// USART1 CLK on PD2
+#define USART1_CLK_PORT                          gpioPortD
+#define USART1_CLK_PIN                           2
+#define USART1_ROUTE_LOC                         1
+
+// USART1 CS on PD3
+#define USART1_CS_PORT                           gpioPortD
+#define USART1_CS_PIN                            3
+
+// USART1 RX on PD1
+#define USART1_RX_PORT                           gpioPortD
+#define USART1_RX_PIN                            1
+
+// USART1 TX on PD0
+#define USART1_TX_PORT                           gpioPortD
+#define USART1_TX_PIN                            0
+
 // [USART1]$
 
 // $[USART2]

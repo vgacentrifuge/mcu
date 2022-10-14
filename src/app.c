@@ -6,11 +6,14 @@
 #include "app.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 #include "sl_sleeptimer.h"
+
 #include "debug.h"
 #include "board_io.h"
 #include "lcd.h"
-#include "em_gpio.h"
+#include "fpga_spi.h"
+#include "sd_card.h"
 
 /***************************************************************************//**
  * Initialize application.
@@ -19,6 +22,8 @@ void app_init(void)
 {
   board_io_init();
   lcd_init();
+  //fpga_spi_init();
+  sd_card_init();
 }
 
 /***************************************************************************//**
@@ -27,14 +32,32 @@ void app_init(void)
 void app_process_action(void)
 {
   static bool lastPressed = false;
-  bool pressed = board_io_get_button0();
+  static uint8_t number = 0;
+
+  bool pressed = false;
+  if (board_io_get_button0()) {
+      pressed = true;
+      if(!lastPressed)
+        number++;
+  }
+  if (board_io_get_button1()) {
+        pressed = true;
+        if(!lastPressed)
+          number--;
+    }
+
   if (pressed && !lastPressed) {
       board_io_set_led0(true);
-      debug_println("Hei!");
-      lcd_print("Sykt!");
-      sl_sleeptimer_delay_millisecond(1000);
-      board_io_set_led0(false);
+      debug_println("Trykk!");
       lcd_clear();
+      lcd_home();
+      char out[20];
+      sprintf(out, "Tall: %d", number);
+      lcd_print(out);
+      // fpga_spi_send(&number, 1);
+
+      sl_sleeptimer_delay_millisecond(100);
+      board_io_set_led0(false);
   }
   lastPressed = pressed;
 }

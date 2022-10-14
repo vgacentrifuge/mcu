@@ -319,7 +319,7 @@ static inline void checked_transfer(I2C_TransferSeq_TypeDef *seq) {
     int ret = I2CSPM_Transfer(_i2cspm, seq);
     if(ret != 0) {
         char out[20];
-        sprintf(out, "LCD fail: %d", ret);
+        snprintf(out, sizeof(out), "LCD fail: %d", ret);
         debug_println(out);
     }
 }

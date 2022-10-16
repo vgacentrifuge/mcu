@@ -5,8 +5,8 @@
  *      Author: marhaug
  */
 
-#include "vendored/DFRobot_LCD.h"
 #include "sl_i2cspm_instances.h"
+#include "DFRobot/DFRobot_LCD.h"
 
 void lcd_init() {
   DFR_init(16, 2, sl_i2cspm_i2c1, LCD_ADDRESS, RGB_ADDRESS);

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <stdint.h>
 
 void lcd_init();
 

@@ -22,8 +22,19 @@ void app_init(void)
 {
   board_io_init();
   lcd_init();
-  //fpga_spi_init();
+  fpga_spi_init();
   sd_card_init();
+
+  if (sd_card_is_mounted()) {
+    static direntry_t entries[32];
+    int entries_read;
+    if(sd_card_list_files("/", entries, 32, &entries_read) == 0) {
+      for(int i = 0; i < entries_read; i++) {
+          debug_println(entries[i].fname);
+      }
+    }
+  }
+
   debug_flush();
 }
 
@@ -55,10 +66,12 @@ void app_process_action(void)
       char out[20];
       sprintf(out, "Tall: %d", number);
       lcd_print(out);
-      // fpga_spi_send(&number, 1);
+      fpga_spi_send(&number, 1);
 
       sl_sleeptimer_delay_millisecond(100);
       board_io_set_led0(false);
   }
   lastPressed = pressed;
+
+  debug_flush();
 }

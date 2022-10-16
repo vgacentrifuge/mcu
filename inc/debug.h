@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <stdint.h>
 
 void debug_flush();
 void debug_printchar(char c);

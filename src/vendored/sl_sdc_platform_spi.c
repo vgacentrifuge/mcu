@@ -65,11 +65,17 @@ sl_status_t sdc_platform_spi_init(void)
 /***************************************************************************//**
  * Exchange a byte.
  ******************************************************************************/
+#include "debug.h"
 sl_status_t sdc_xchg_spi(BYTE tx, BYTE *rx)
 {
   sl_status_t retval;
 
   retval = SPIDRV_MTransferB(sdc_spi_handle, &tx, rx, 1);
+  /*debug_print("s,r: ");
+  debug_printhexbyte(tx);
+  debug_printchar(',');
+  debug_printhexbyte(*rx);
+  debug_printchar('\n');*/
   if (retval != ECODE_EMDRV_SPIDRV_OK) {
     *rx = 0;
     return SL_STATUS_TRANSMIT;

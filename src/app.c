@@ -24,6 +24,7 @@ void app_init(void)
   lcd_init();
   //fpga_spi_init();
   sd_card_init();
+  debug_flush();
 }
 
 /***************************************************************************//**

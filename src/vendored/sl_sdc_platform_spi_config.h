@@ -45,7 +45,7 @@
 #define SD_CARD_MMC_PERIPHERAL_NO           SL_SPIDRV_USART_SDCARD_PERIPHERAL_NO
 
 // Set slow clock for card initialization (100k-400k)
-#define SD_CARD_MMC_SLOW_CLOCK              200000
+#define SD_CARD_MMC_SLOW_CLOCK              100000
 // Set fast clock for generic read/write
 #define SD_CARD_MMC_FAST_CLOCK              SL_SPIDRV_USART_SDCARD_BITRATE
 

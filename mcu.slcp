@@ -34,6 +34,7 @@ component:
 - {id: emlib_lcd}
 - {id: sl_system}
 - {id: device_init}
+- {id: debug_swo}
 - {id: sleeptimer}
 - {id: brd2200a}
 - {id: EFM32GG990F1024}

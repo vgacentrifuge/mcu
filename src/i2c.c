@@ -86,7 +86,7 @@ void sendSignal(void) {
   uint8_t values[2] = {0,0};
   values[0] = _REGISTER_ADDRESS;
   values[1] = _REGISTER_VALUE;
-  i2cTransfert.addr = I2C_ADDR;
+  // i2cTransfert.addr = I2C_ADDR;
   i2cTransfert.flags = I2C_FLAG_WRITE_WRITE;
   i2cTransfert.buf[0].len = 1;
   i2cTransfert.buf[0].data = &values[0];

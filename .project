@@ -282,24 +282,14 @@
 			<locationURI>STUDIO_SDK_LOC/platform/driver/debug/src/sl_debug_swo.c</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/inc/sl_led.h</name>
+			<name>gecko_sdk_4.1.1/platform/driver/i2cspm/inc/sl_i2cspm.h</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/inc/sl_led.h</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/i2cspm/inc/sl_i2cspm.h</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/inc/sl_simple_led.h</name>
+			<name>gecko_sdk_4.1.1/platform/driver/i2cspm/src/sl_i2cspm.c</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/inc/sl_simple_led.h</locationURI>
-		</link>
-		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/src/sl_led.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/src/sl_led.c</locationURI>
-		</link>
-		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/src/sl_simple_led.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/src/sl_simple_led.c</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/i2cspm/src/sl_i2cspm.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/service/device_init/inc/sl_device_init_clocks.h</name>
@@ -390,6 +380,21 @@
 			<name>gecko_sdk_4.1.1/platform/service/system/src/sl_system_process_action.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/service/system/src/sl_system_process_action.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/inc/sl_udelay.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/inc/sl_udelay.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/src/sl_udelay.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/src/sl_udelay.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/src/sl_udelay_armv6m_gcc.S</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/src/sl_udelay_armv6m_gcc.S</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/Device/SiliconLabs/EFM32GG/Include/efm32gg990f1024.h</name>

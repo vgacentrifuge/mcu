@@ -1,6 +1,6 @@
 /***************************************************************************//**
  * @file
- * @brief Blink examples functions
+ * @brief I2C simple poll-based master mode driver instances
  *******************************************************************************
  * # License
  * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
@@ -14,18 +14,26 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+ 
+#ifndef SL_I2CSPM_INSTANCES_H
+#define SL_I2CSPM_INSTANCES_H
 
-#ifndef BLINK_H
-#define BLINK_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/***************************************************************************//**
- * Initialize blink example
- ******************************************************************************/
-void blink_init(void);
+#include "sl_i2cspm.h"
 
-/***************************************************************************//**
- * Blink ticking function
- ******************************************************************************/
-void blink_process_action(void);
 
-#endif  // BLINK_H
+#define SL_I2CSPM_I2C1_PRESENT
+
+
+extern sl_i2cspm_t *sl_i2cspm_i2c1;
+
+void sl_i2cspm_init_instances(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // SL_I2CSPM_INSTANCES_H

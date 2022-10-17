@@ -16,6 +16,9 @@ void lcd_print(char* str) {
   DFR_print(str);
 }
 
+/**
+ * Clears the display, also sets the cursor to home
+ */
 void lcd_clear() {
   DFR_clear();
 }

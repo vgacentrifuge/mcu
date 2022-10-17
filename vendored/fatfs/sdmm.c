@@ -53,33 +53,11 @@
 /*-------------------------------------------------------------------------*/
 
 /*
- * Custom dly_us implementation added by Håvard
- * based on sl_sleeptimer_delay_millisecond
+ * dly_us implementation added by Håvard
  */
-#include "sl_sleeptimer.h"
-static void dly_callback(sl_sleeptimer_timer_handle_t *handle, void *data) {
-  (void)handle;  // Unused parameter.
-  volatile bool *wait_flag = (bool *)data;
-  *wait_flag = false;
-}
-
+#include "sl_udelay.h"
 static void dly_us (UINT time_us) {
-  volatile bool wait = true;
-  sl_status_t error_code;
-  sl_sleeptimer_timer_handle_t delay_timer;
-  uint32_t delay_1000 = sl_sleeptimer_ms_to_tick(time_us);
-  uint32_t delay = (delay_1000 + 999) / 1000; // Round up to whole ticks
-
-  error_code = sl_sleeptimer_start_timer(&delay_timer,
-                                         delay,
-                                         dly_callback,
-                                         (void *)&wait,
-                                         0,
-                                         0);
-  if (error_code == SL_STATUS_OK) {
-    while (wait) { // Active delay loop.
-    }
-  }
+  sl_udelay_wait(time_us);
 }
 
 

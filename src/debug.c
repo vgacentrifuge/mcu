@@ -1,7 +1,6 @@
 #include "debug.h"
 
 #include "sl_debug_swo.h"
-#include "efm32gg990f1024.h"
 #include <stdio.h>
 
 // We use the SWO Debug package to send data over the SWO line

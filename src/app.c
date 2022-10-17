@@ -60,9 +60,7 @@ void app_process_action(void)
 
   if (pressed && !lastPressed) {
       board_io_set_led0(true);
-      debug_println("Trykk!");
       lcd_clear();
-      lcd_home();
       char out[20];
       sprintf(out, "Tall: %d", number);
       lcd_print(out);

@@ -13,9 +13,8 @@ media layer to use the Gecko SDK's SPIDRV api, all in the file `sdmm.c`:
      and implement CS_L() and CS_H() as NO-OPs.
      This means the deselect() function no longer works,
      but since the SD card is alone on its SPI bus, that's fine.
- - Implement `dly_us`, based strongly on `sl_sleeptimer_delay_millisecond`
-   (It does some rounding up since the tick period is larger than 1us)
- - Update `xmit_mmc` and `rcvr_mmc` to use SPIDRV.
+ - Implement `dly_us`, using `sl_udelay` from the Gecko SDK.
+ - Update `xmit_mmc` and `rcvr_mmc` to use SPIDRV from the Gecko SDK.
  - Update `disk_initalize()`
    - Set `dummyTxValue` to `0xFF`, since that was default for recieves.
    - Remove INIT macros for pins handled by SPIDRV

@@ -1,15 +1,22 @@
-/*
- * debug.h
- *
- *  Created on: 28. sep. 2022
- *      Author: amatho
- */
+/***************************************************************************//**
+ * @file
+ * @brief Debugging helpers
+ ******************************************************************************/
 
-#ifndef INC_DEBUG_H_
-#define INC_DEBUG_H_
+#pragma once
 
-void debug_init(void);
+#include <stdint.h>
 
-void debug_send_string(char *);
+void debug_flush();
+void debug_printchar(char c);
+void debug_print(char* str);
+void debug_println(char* str);
+void debug_printintln(int i);
+void debug_printhexbyte(uint8_t byte);
+void debug_printhexbytesln(uint8_t* bytes, int len);
 
-#endif /* INC_DEBUG_H_ */
+#define DEBUG_HERE() do { \
+  debug_print(__FILE__); \
+  debug_printchar(':');  \
+  debug_printintln(__LINE__); \
+  } while(0)

@@ -25,13 +25,14 @@ include:
   file_list:
   - {path: app.h}
   - {path: blink.h}
-sdk: {id: gecko_sdk, version: 4.1.1}
+sdk: {id: gecko_sdk, version: 4.1.2}
 toolchain_settings: []
 component:
-- instance: [led0]
-  id: simple_led
+- instance: [i2c1]
+  id: i2cspm
 - {id: sl_system}
 - {id: device_init}
+- {id: debug_swo}
 - {id: sleeptimer}
 - {id: brd2200a}
 - {id: EFM32GG990F1024}

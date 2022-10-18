@@ -28,6 +28,7 @@
 		<nature>com.silabs.ss.framework.ide.project.sls.core.SLSProjectNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
@@ -146,6 +147,16 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_gpio.h</locationURI>
 		</link>
 		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_i2c.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_i2c.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_lcd.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_lcd.h</locationURI>
+		</link>
+		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/inc/em_msc.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_msc.h</locationURI>
@@ -209,6 +220,16 @@
 			<name>gecko_sdk_4.1.1/platform/emlib/src/em_gpio.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_gpio.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/src/em_i2c.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_i2c.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/emlib/src/em_lcd.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_lcd.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/emlib/src/em_msc.c</name>
@@ -281,24 +302,24 @@
 			<locationURI>STUDIO_SDK_LOC/platform/common/toolchain/src/sl_memory.c</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/inc/sl_led.h</name>
+			<name>gecko_sdk_4.1.1/platform/driver/debug/inc/sl_debug_swo.h</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/inc/sl_led.h</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/debug/inc/sl_debug_swo.h</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/inc/sl_simple_led.h</name>
+			<name>gecko_sdk_4.1.1/platform/driver/debug/src/sl_debug_swo.c</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/inc/sl_simple_led.h</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/debug/src/sl_debug_swo.c</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/src/sl_led.c</name>
+			<name>gecko_sdk_4.1.1/platform/driver/i2cspm/inc/sl_i2cspm.h</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/src/sl_led.c</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/i2cspm/inc/sl_i2cspm.h</locationURI>
 		</link>
 		<link>
-			<name>gecko_sdk_4.1.1/platform/driver/leddrv/src/sl_simple_led.c</name>
+			<name>gecko_sdk_4.1.1/platform/driver/i2cspm/src/sl_i2cspm.c</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/driver/leddrv/src/sl_simple_led.c</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/driver/i2cspm/src/sl_i2cspm.c</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/emdrv/common/inc/ecode.h</name>
@@ -424,6 +445,21 @@
 			<name>gecko_sdk_4.1.1/platform/service/system/src/sl_system_process_action.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/service/system/src/sl_system_process_action.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/inc/sl_udelay.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/inc/sl_udelay.h</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/src/sl_udelay.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/src/sl_udelay.c</locationURI>
+		</link>
+		<link>
+			<name>gecko_sdk_4.1.1/platform/service/udelay/src/sl_udelay_armv6m_gcc.S</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/service/udelay/src/sl_udelay_armv6m_gcc.S</locationURI>
 		</link>
 		<link>
 			<name>gecko_sdk_4.1.1/platform/Device/SiliconLabs/EFM32GG/Include/efm32gg990f1024.h</name>

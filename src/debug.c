@@ -1,62 +1,52 @@
-/*
- * debug.c
- *
- *  Created on: 28. sep. 2022
- *      Author: amatho
- */
+#include "debug.h"
 
-#include "efm32gg990f1024.h"
+#include "sl_debug_swo.h"
+#include <stdio.h>
 
-void debug_init(void) {
-#if DEBUG_EFM
-    /* Enable GPIO clock. */
-    CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO;
+// We use the SWO Debug package to send data over the SWO line
+// which is PF7 on both the dev board and our PCB
 
-    /* Enable Serial wire output pin */
-    GPIO->ROUTE |= GPIO_ROUTE_SWOPEN;
+char print_buffer[4096];
+int buffer_used;
 
-#if defined(_EFM32_GIANT_FAMILY) || defined(_EFM32_LEOPARD_FAMILY) || defined(_EFM32_WONDER_FAMILY)
-    /* Set location 0 */
-    GPIO->ROUTE = (GPIO->ROUTE & ~(_GPIO_ROUTE_SWLOCATION_MASK))
-            | GPIO_ROUTE_SWLOCATION_LOC0;
-
-    /* Enable output on pin - GPIO Port F, Pin 2 */
-    GPIO->P[5].MODEL &= ~(_GPIO_P_MODEL_MODE2_MASK);
-    GPIO->P[5].MODEL |= GPIO_P_MODEL_MODE2_PUSHPULL;
-#else
-    /* Set location 1 */
-    GPIO->ROUTE = (GPIO->ROUTE & ~(_GPIO_ROUTE_SWLOCATION_MASK)) |GPIO_ROUTE_SWLOCATION_LOC1;
-    /* Enable output on pin */
-    GPIO->P[2].MODEH &= ~(_GPIO_P_MODEH_MODE15_MASK);
-    GPIO->P[2].MODEH |= GPIO_P_MODEH_MODE15_PUSHPULL;
-#endif
-
-    /* Enable debug clock AUXHFRCO */
-    CMU->OSCENCMD = CMU_OSCENCMD_AUXHFRCOEN;
-
-    /* Wait until clock is ready */
-    while (!(CMU->STATUS & CMU_STATUS_AUXHFRCORDY))
-        ;
-
-    /* Enable trace in core debug */
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    ITM->LAR = 0xC5ACCE55;
-    ITM->TER = 0x0;
-    ITM->TCR = 0x0;
-    TPI->SPPR = 2;
-    TPI->ACPR = 0xf;
-    ITM->TPR = 0x0;
-    DWT->CTRL = 0x400003FE;
-    ITM->TCR = 0x0001000D;
-    TPI->FFCR = 0x00000100;
-    ITM->TER = 0x1;
-#endif
+void debug_flush() {
+  for(int i = 0; i < buffer_used; i++)
+    sl_debug_swo_write_u8(0, print_buffer[i]);
+  buffer_used = 0;
 }
 
-void debug_send_string(char *str) {
-#if DEBUG_EFM
-    for (; *str != '\0'; str++) {
-        ITM_SendChar(*str);
-    }
-#endif
+void debug_printchar(char c) {
+  if(buffer_used == sizeof(print_buffer)) {
+    debug_flush(); debug_print("<force flush>");
+  }
+  print_buffer[buffer_used++] = c;
+}
+
+void debug_print(char* str) {
+  for(; *str != '\0'; str++)
+    debug_printchar(*str);
+}
+
+void debug_println(char* str) {
+  debug_print(str);
+  debug_printchar('\n');
+}
+
+void debug_printintln(int i) {
+  char out[20];
+  snprintf(out, sizeof(out), "%d", i);
+  debug_println(out);
+}
+
+void debug_printhexbyte(uint8_t byte) {
+  char out[20];
+  snprintf(out, sizeof(out), "%x ", byte);
+  debug_print(out);
+}
+
+void debug_printhexbytesln(uint8_t* bytes, int len) {
+  for(int i = 0; i < len; i++) {
+      debug_printhexbyte(bytes[i]);
+  }
+  debug_printchar('\n');
 }

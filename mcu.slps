@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ASCII"?>
 <model:MDescriptors xmlns:model="http://www.silabs.com/ss/Studio.ecore">
   <descriptors name="mcu">
-    <properties key="projectCommon.sdkId" value="com.silabs.sdk.stack.super:4.1.1._1307122315"/>
+    <properties key="projectCommon.sdkId" value="com.silabs.sdk.stack.super:4.1.1._-748151666"/>
     <properties key="universalConfig.generationDirectory" value=""/>
     <properties key="universalConfig.toolchainCompatibility" value="iar gcc"/>
     <properties key="projectCommon.boardIds" value="brd2200a:0.0.0.A03"/>
@@ -11,4 +11,4 @@
     <properties key="universalConfig.projectTypeIds" value="com.silabs.ss.framework.ide.project.core.cdtMbsProjectType"/>
     <properties key="projectCommon.importModeId" value="LINK_LIBRARIES"/>
   </descriptors>
-</model:MDescriptors>
+</model:MDescriptors>

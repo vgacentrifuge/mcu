@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="ASCII"?>
-<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="pin_tool.EFM32GG990F1024" partId="mcu.arm.efm32.gg.efm32gg990f1024" contextId="com.silabs.sdk.stack.super:4.1.1._902307522">
+<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="pin_tool.EFM32GG990F1024" partId="mcu.arm.efm32.gg.efm32gg990f1024" contextId="com.silabs.sdk.stack.super:4.1.2._1879360191">
   <mode name="DefaultMode">
+    <property object="DBG" propertyId="ABModule.selectedRequirement" value="dbg%T%SL_DEBUG%T%sl_debug_swo_config.h"/>
+    <property object="DBG" propertyId="ABPeripheral.included" value="true"/>
     <property object="DefaultMode" propertyId="mode.diagramLocation" value="100, 100"/>
+    <property object="I2C1" propertyId="ABModule.selectedRequirement" value="i2c%T%SL_I2CSPM_I2C1%T%sl_i2cspm_i2c1_config.h"/>
+    <property object="I2C1" propertyId="ABPeripheral.included" value="true"/>
     <property object="PE2" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_LED_LED0%T%sl_simple_led_led0_config.h"/>
     <property object="PE2" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PF7" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_BOARD_ENABLE_VCOM%T%sl_board_control_config.h"/>
     <property object="PF7" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PORTIO" propertyId="portio.dbg.enable.swo" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.i2c1.enable.scl" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.i2c1.enable.sda" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.clk" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.cs" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.rx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.tx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.route" value="1"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.clk" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.cs" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.location.route" value="1"/>
-    <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
+    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_USART_FPGA%T%sl_spidrv_usart_fpga_config.h"/>
+    <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
     <property object="USART1" propertyId="ABPeripheral.included" value="true"/>
+    <property object="USART2" propertyId="ABPeripheral.included" value="true"/>
   </mode>
   <modeTransition>
     <property object="RESET &#x2192; DefaultMode" propertyId="modeTransition.source" value="RESET"/>

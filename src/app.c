@@ -8,22 +8,20 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "sl_sleeptimer.h"
-
 #include "debug.h"
+#include "sd_card.h"
 
 /***************************************************************************//**
  * Initialize application.
  ******************************************************************************/
-void app_init(void)
-{
-
+void app_init(void) {
   debug_flush();
+  sd_card_init();
 }
 
 /***************************************************************************//**
  * App ticking function.
  ******************************************************************************/
-void app_process_action(void)
-{
+void app_process_action(void) {
 
 }

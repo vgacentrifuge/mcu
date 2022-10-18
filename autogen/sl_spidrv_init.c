@@ -35,7 +35,7 @@ SPIDRV_Init_t sl_spidrv_init_sd_card = {
 #endif
   .bitRate = SL_SPIDRV_SD_CARD_BITRATE,
   .frameLength = SL_SPIDRV_SD_CARD_FRAME_LENGTH,
-  .dummyTxValue = 0xFF,
+  .dummyTxValue = 0,
   .type = SL_SPIDRV_SD_CARD_TYPE,
   .bitOrder = SL_SPIDRV_SD_CARD_BIT_ORDER,
   .clockMode = SL_SPIDRV_SD_CARD_CLOCK_MODE,

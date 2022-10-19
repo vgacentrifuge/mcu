@@ -1,7 +1,8 @@
-#include <string.h>
 #include "sd_card.h"
-#include "fatfs/ff.h"
+#include <string.h>
 #include "debug.h"
+
+#include "fatfs/ff.h"
 
 #define LOGICAL_DRIVE_NUMBER ""
 #define MOUNT_IMMEDIATLY 1

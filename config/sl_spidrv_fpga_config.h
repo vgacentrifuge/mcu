@@ -64,25 +64,25 @@
 // <<< sl:start pin_tool >>>
 // <usart signal=TX,RX,CLK,(CS)> SL_SPIDRV_FPGA
 // $[USART_SL_SPIDRV_FPGA]
-#define SL_SPIDRV_FPGA_PERIPHERAL             USART1
-#define SL_SPIDRV_FPGA_PERIPHERAL_NO          1
+#define SL_SPIDRV_FPGA_PERIPHERAL                USART1
+#define SL_SPIDRV_FPGA_PERIPHERAL_NO             1
 
 // USART1 TX on PD0
-#define SL_SPIDRV_FPGA_TX_PORT                gpioPortD
-#define SL_SPIDRV_FPGA_TX_PIN                 0
-#define SL_SPIDRV_FPGA_ROUTE_LOC              1
+#define SL_SPIDRV_FPGA_TX_PORT                   gpioPortD
+#define SL_SPIDRV_FPGA_TX_PIN                    0
+#define SL_SPIDRV_FPGA_ROUTE_LOC                 1
 
 // USART1 RX on PD1
-#define SL_SPIDRV_FPGA_RX_PORT                gpioPortD
-#define SL_SPIDRV_FPGA_RX_PIN                 1
+#define SL_SPIDRV_FPGA_RX_PORT                   gpioPortD
+#define SL_SPIDRV_FPGA_RX_PIN                    1
 
 // USART1 CLK on PD2
-#define SL_SPIDRV_FPGA_CLK_PORT               gpioPortD
-#define SL_SPIDRV_FPGA_CLK_PIN                2
+#define SL_SPIDRV_FPGA_CLK_PORT                  gpioPortD
+#define SL_SPIDRV_FPGA_CLK_PIN                   2
 
 // USART1 CS on PD3
-#define SL_SPIDRV_FPGA_CS_PORT                gpioPortD
-#define SL_SPIDRV_FPGA_CS_PIN                 3
+#define SL_SPIDRV_FPGA_CS_PORT                   gpioPortD
+#define SL_SPIDRV_FPGA_CS_PIN                    3
 // [USART_SL_SPIDRV_FPGA]$
 // <<< sl:end pin_tool >>>
 

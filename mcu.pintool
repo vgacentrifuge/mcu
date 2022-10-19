@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="pin_tool.EFM32GG990F1024" partId="mcu.arm.efm32.gg.efm32gg990f1024" contextId="com.silabs.sdk.stack.super:4.1.2._-500225019">
+<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="pin_tool.EFM32GG990F1024" partId="mcu.arm.efm32.gg.efm32gg990f1024" contextId="com.silabs.sdk.stack.super:4.1.2._1879360191">
   <mode name="DefaultMode">
     <property object="DBG" propertyId="ABModule.selectedRequirement" value="dbg%T%SL_DEBUG%T%sl_debug_swo_config.h"/>
     <property object="DBG" propertyId="ABPeripheral.included" value="true"/>
@@ -38,9 +38,9 @@
     <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.location.route" value="1"/>
-    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_FPGA%T%sl_spidrv_fpga_config.h"/>
+    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
     <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
-    <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
+    <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_FPGA%T%sl_spidrv_fpga_config.h"/>
     <property object="USART1" propertyId="ABPeripheral.included" value="true"/>
     <property object="USART2" propertyId="ABPeripheral.included" value="true"/>
   </mode>

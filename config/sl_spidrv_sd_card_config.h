@@ -64,25 +64,25 @@
 // <<< sl:start pin_tool >>>
 // <usart signal=TX,RX,CLK,(CS)> SL_SPIDRV_SD_CARD
 // $[USART_SL_SPIDRV_SD_CARD]
-#define SL_SPIDRV_SD_CARD_PERIPHERAL             USART1
-#define SL_SPIDRV_SD_CARD_PERIPHERAL_NO          1
+#define SL_SPIDRV_SD_CARD_PERIPHERAL                USART0
+#define SL_SPIDRV_SD_CARD_PERIPHERAL_NO             0
 
-// USART1 TX on PD0
-#define SL_SPIDRV_SD_CARD_TX_PORT                gpioPortD
-#define SL_SPIDRV_SD_CARD_TX_PIN                 0
-#define SL_SPIDRV_SD_CARD_ROUTE_LOC              1
+// USART0 TX on PE7
+#define SL_SPIDRV_SD_CARD_TX_PORT                   gpioPortE
+#define SL_SPIDRV_SD_CARD_TX_PIN                    7
+#define SL_SPIDRV_SD_CARD_ROUTE_LOC                 1
 
-// USART1 RX on PD1
-#define SL_SPIDRV_SD_CARD_RX_PORT                gpioPortD
-#define SL_SPIDRV_SD_CARD_RX_PIN                 1
+// USART0 RX on PE6
+#define SL_SPIDRV_SD_CARD_RX_PORT                   gpioPortE
+#define SL_SPIDRV_SD_CARD_RX_PIN                    6
 
-// USART1 CLK on PD2
-#define SL_SPIDRV_SD_CARD_CLK_PORT               gpioPortD
-#define SL_SPIDRV_SD_CARD_CLK_PIN                2
+// USART0 CLK on PE5
+#define SL_SPIDRV_SD_CARD_CLK_PORT                  gpioPortE
+#define SL_SPIDRV_SD_CARD_CLK_PIN                   5
 
-// USART1 CS on PD3
-#define SL_SPIDRV_SD_CARD_CS_PORT                gpioPortD
-#define SL_SPIDRV_SD_CARD_CS_PIN                 3
+// USART0 CS on PE4
+#define SL_SPIDRV_SD_CARD_CS_PORT                   gpioPortE
+#define SL_SPIDRV_SD_CARD_CS_PIN                    4
 // [USART_SL_SPIDRV_SD_CARD]$
 // <<< sl:end pin_tool >>>
 

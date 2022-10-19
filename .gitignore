@@ -4,3 +4,5 @@ build/
 gecko_sdk_*.*.*/
 GNU ARM v*.*.* - *
 lst/
+*.bak
+.trash/

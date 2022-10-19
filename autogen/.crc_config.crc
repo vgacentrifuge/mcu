@@ -10,6 +10,7 @@ sl_memory_config.h=-995392215
 sl_simple_led_led0_config.h=-219882604
 sl_sleeptimer_config.h=-1074849105
 sl_spidrv_exp_config.h=-1143755113
+sl_spidrv_fpga_config.h=-639973183
 sl_spidrv_usart_fpga_config.h=119417252
 sl_spidrv_usart_sdcard_config.h=-302095532
 spidrv_config.h=1282557349

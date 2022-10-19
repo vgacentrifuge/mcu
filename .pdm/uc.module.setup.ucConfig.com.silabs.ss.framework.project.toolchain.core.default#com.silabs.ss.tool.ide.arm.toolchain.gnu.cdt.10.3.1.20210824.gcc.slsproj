@@ -9,6 +9,7 @@
     <file name="spidrv_config.h" generated="true" linked="false"/>
     <file name="sl_i2cspm_i2c1_config.h" generated="true" linked="false"/>
     <file name="sl_device_init_hfxo_config.h" generated="true" linked="false"/>
+    <file name="sl_spidrv_fpga_config.h" generated="true" linked="false"/>
     <file name="sl_spidrv_sd_card_config.h" generated="true" linked="false"/>
     <file name="emlib_core_debug_config.h" generated="true" linked="false"/>
     <file name="sl_sleeptimer_config.h" generated="true" linked="false"/>

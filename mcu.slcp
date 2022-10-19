@@ -32,7 +32,7 @@ component:
   id: i2cspm
 - {id: sl_system}
 - {id: device_init}
-- instance: [sd_card]
+- instance: [fpga, sd_card]
   id: spidrv
 - {id: debug_swo}
 - {id: sleeptimer}

@@ -19,3 +19,5 @@ void lcd_clear();
 void lcd_home();
 
 void lcd_set_cursor(uint8_t col, uint8_t line);
+
+void lcd_set_color(uint8_t r, uint8_t g, uint8_t b);

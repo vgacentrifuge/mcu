@@ -15,9 +15,11 @@
 #include "fpga_spi.h"
 #include "sd_card.h"
 #include "keypad.h"
+#include "state.h"
 
 #define CHOICE_SCREEN_WIDTH (LCD_COLUMNS-2)
 static char CHOICES[20][CHOICE_SCREEN_WIDTH+1] = {
+  "Home",
   "Save state",
   "Load state",
   "Hotkeys",
@@ -31,6 +33,9 @@ static uint32_t NUM_CHOICES = 6;
 /***************************************************************************//**
  * Initialize application.
  ******************************************************************************/
+// global state
+struct State state;
+
 void app_init(void)
 {
   board_io_init();
@@ -38,6 +43,10 @@ void app_init(void)
   sd_card_init();
   keypad_init();
   lcd_init();
+
+  state.width = 800;
+  state.height = 600;
+  state.current_menu = CHOICES[0];
 
   if (sd_card_is_mounted()) {
     static direntry_t entries[32];
@@ -72,48 +81,100 @@ void app_process_action(void)
   static bool menu_dirty = true;
   static int marker_blink_timer;
 
-  if (keypad_keypressed(KEY_DOWN)) {
-    choice++;
-    if (choice >= scroll + LCD_LINES)
-      scroll++;
-    menu_dirty = true;
-  }
-  if (keypad_keypressed(KEY_UP)) {
-    choice--;
-    if (choice < scroll)
-      scroll--;
-    menu_dirty = true;
-  }
-  choice = (choice + NUM_CHOICES) % NUM_CHOICES;
-  scroll = (scroll + NUM_SCROLLS) % NUM_SCROLLS;
-
-  if (menu_dirty) {
-    // We must redraw the menu on the LCD screen
-    menu_dirty = false;
-    lcd_clear();
-    for (int i = 0; i < LCD_LINES; i++) {
-      lcd_set_cursor(1, i);
-      lcd_print(CHOICES[scroll+i]);
-      marker_blink_timer = 0;
-    }
-  }
-
-  if (marker_blink_timer % 20 == 0) {
-    marker_blink_timer %= 40;
-    bool show_marker = marker_blink_timer == 0;
-    lcd_set_cursor(0, choice-scroll);
-    lcd_print(show_marker ? ">" : " ");
-  }
-  marker_blink_timer++;
-
-  if (keypad_keypressed(KEY_LEFT))
-    board_io_set_led0(false);
-  if (keypad_keypressed(KEY_RIGHT)) {
-    board_io_set_led0(true);
-    debug_print("Pressed right on menu choice: ");
-    debug_println(CHOICES[choice]);
+  switch (state.current_menu)
+  {
+    case "Home":       home_menu();       break;
+    case "Save state": save_state();      break;
+    case "Load state": load_state();      break;
+    case "Hotkeys":    hotkeys_menu();    break;
+    case "Use image":  use_image_menu();  break;
+    case "Transition": transition_menu(); break;
+    case "Slideshow":  slideshow_menu();  break;
   }
 
   sl_sleeptimer_delay_millisecond(16); // About 60 frames a second
   debug_flush();
+}
+
+void home_menu(void)
+{
+
+  static int choice;
+  static int scroll;
+  static bool menu_dirty = true;
+  static int marker_blink_timer;
+
+  if (keypad_keypressed(KEY_DOWN)) {
+      choice++;
+      if (choice >= scroll + LCD_LINES)
+        scroll++;
+      menu_dirty = true;
+    }
+    if (keypad_keypressed(KEY_UP)) {
+      choice--;
+      if (choice < scroll)
+        scroll--;
+      menu_dirty = true;
+    }
+    choice = (choice + NUM_CHOICES) % NUM_CHOICES;
+    scroll = (scroll + NUM_SCROLLS) % NUM_SCROLLS;
+
+    if (menu_dirty) {
+      // We must redraw the menu on the LCD screen
+      menu_dirty = false;
+      lcd_clear();
+      for (int i = 0; i < LCD_LINES; i++) {
+        lcd_set_cursor(1, i);
+        lcd_print(CHOICES[scroll+i]);
+        marker_blink_timer = 0;
+      }
+    }
+
+    if (marker_blink_timer % 20 == 0) {
+      marker_blink_timer %= 40;
+      bool show_marker = marker_blink_timer == 0;
+      lcd_set_cursor(0, choice-scroll);
+      lcd_print(show_marker ? ">" : " ");
+    }
+    marker_blink_timer++;
+
+    if (keypad_keypressed(KEY_LEFT))
+      board_io_set_led0(false);
+    if (keypad_keypressed(KEY_RIGHT)) {
+      board_io_set_led0(true);
+      debug_print("Pressed right on menu choice: ");
+      debug_println(CHOICES[choice]);
+      state.current_menu = CHOICES[choice];
+    }
+
+}
+
+void save_state(void)
+{
+
+}
+
+void load_state(void)
+{
+
+}
+
+void hotkeys_menu(void)
+{
+
+}
+
+void use_image_menu(void)
+{
+
+}
+
+void transition_menu(void)
+{
+
+}
+
+void slideshow_menu(void)
+{
+
 }

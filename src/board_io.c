@@ -1,8 +1,14 @@
 #include "board_io.h"
 #include "em_gpio.h"
 
-// This header is specific to the board, will need changes for the non-devboard version
+#ifdef ON_VGA_CENTRIFUGE_PCB
+#include "pin_config.h"
+#define BSP_GPIO_LED0_PORT GPIO_LED0_PORT
+#define BSP_GPIO_LED0_PIN GPIO_LED0_PIN
+#else
+// This header only works for the devboard
 #include "bspconfig.h"
+#endif
 
 void board_io_init() {
 #ifdef BSP_GPIO_LED0_PIN
@@ -65,6 +71,8 @@ void board_io_set_led0(bool state) {
     GPIO_PinOutSet(BSP_GPIO_LED0_PORT, BSP_GPIO_LED0_PIN);
   else
     GPIO_PinOutClear(BSP_GPIO_LED0_PORT, BSP_GPIO_LED0_PIN);
+#else
+  (void)state;
 #endif
 }
 
@@ -78,5 +86,7 @@ void board_io_set_led1(bool state) {
     GPIO_PinOutSet(BSP_GPIO_LED1_PORT, BSP_GPIO_LED1_PIN);
   else
     GPIO_PinOutClear(BSP_GPIO_LED1_PORT, BSP_GPIO_LED1_PIN);
+#else
+  (void)state;
 #endif
 }

@@ -14,8 +14,7 @@ const int RAYLIB_KEY_RIGHT = KEY_RIGHT;
 #define KEY_STRIDE_X (KEY_WIDTH+KEY_SPACING)
 #define KEY_STRIDE_Y (KEY_HEIGHT+KEY_SPACING)
 
-bool previousState[KEYPAD_ROWS * KEYPAD_COLS];
-bool currentState[KEYPAD_ROWS * KEYPAD_COLS];
+int key_down_time[KEYPAD_ROWS * KEYPAD_COLS];
 
 const char* keySymbols[KEYPAD_ROWS * KEYPAD_COLS] = {
 [KEY_UP] = "^",
@@ -36,9 +35,6 @@ void keypad_init() {
 }
 
 void keypad_sample() {
-    // Store the previous state, to get exactly one frame of pressing and releasing
-    memcpy(previousState, currentState, sizeof(currentState));
-
     int mouseX = GetMouseX() - KEYPAD_X;
     int mouseY = GetMouseY() - KEYPAD_Y;
     bool mouseDown = IsMouseButtonDown(0);
@@ -49,24 +45,37 @@ void keypad_sample() {
             int localY = mouseY - y*KEY_STRIDE_Y;
             bool hover = localX >= 0 && localX < KEY_WIDTH && localY >= 0 && localY < KEY_HEIGHT;
             int index = KEY_INDEX(x, y);
-            currentState[index] = hover && (mousePressed || (mouseDown && previousState[index]));
 
-            if(keyboardAlternatives[index] && IsKeyDown(keyboardAlternatives[index]))
-                currentState[index] = true;
+            // Just like in the actual keypad code,
+            // a negative down time means the last frame was a release
+            if (key_down_time[index] < 0)
+                key_down_time[index] = 0;
+
+            bool startingPress = hover && mousePressed;
+            bool holdingPress = key_down_time[index] >= 1 && hover && mouseDown;
+            bool keyPressing = keyboardAlternatives[index] && IsKeyDown(keyboardAlternatives[index]);
+
+            if (startingPress || holdingPress || keyPressing)
+                key_down_time[index]++;
+            else if(key_down_time[index] > 0) // We just released the key
+                key_down_time[index] = -key_down_time[index];
         }
     }
 }
 
 bool keypad_keydown(int key) {
-    return currentState[key];
+    return key_down_time[key]>=1;
 }
 
 bool keypad_keypressed(int key) {
-    return !previousState[key] && currentState[key];
+    return key_down_time[key]==1;
 }
 
-bool keypad_keyreleased(int key) {
-    return previousState[key] && !currentState[key];
+bool keypad_keyreleased(int key, int* was_down_frames) {
+    bool released = key_down_time[key] < 0;
+    if (released && was_down_frames)
+        *was_down_frames = -key_down_time[key];
+    return released;
 }
 
 void keypad_draw() {
@@ -74,7 +83,7 @@ void keypad_draw() {
     for(int y = 0; y < KEYPAD_COLS; y++) {
         for(int x = 0; x < KEYPAD_ROWS; x++) {
             int index = KEY_INDEX(x, y);
-            Color color = currentState[index] ? BLACK : LIGHTGRAY;
+            Color color = keypad_keydown(index) ? BLACK : LIGHTGRAY;
             DrawRectangle(x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_WIDTH, KEY_HEIGHT, color);
             if(keySymbols[index])
                 DrawText(keySymbols[index], x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_HEIGHT, GRAY);

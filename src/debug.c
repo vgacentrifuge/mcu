@@ -22,12 +22,12 @@ void debug_printchar(char c) {
   print_buffer[buffer_used++] = c;
 }
 
-void debug_print(char* str) {
+void debug_print(const char* str) {
   for(; *str != '\0'; str++)
     debug_printchar(*str);
 }
 
-void debug_println(char* str) {
+void debug_println(const char* str) {
   debug_print(str);
   debug_printchar('\n');
 }

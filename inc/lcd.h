@@ -7,6 +7,9 @@
 
 #include <stdint.h>
 
+#define LCD_LINES 2
+#define LCD_COLUMNS 16
+
 void lcd_init();
 
 void lcd_print(char* str);

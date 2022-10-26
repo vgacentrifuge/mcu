@@ -72,7 +72,7 @@ void keypad_init() {
 }
 
 void keypad_sample() {
-  for(int row = 0; row < KEYPAD_ROWS; row++) {
+  for (int row = 0; row < KEYPAD_ROWS; row++) {
     GPIO_PinOutSet(row_ports[row], row_pins[row]);
     sl_udelay_wait(10); // wait for some microseconds for RC to happen
     for (int col = 0; col < KEYPAD_COLS; col++) {
@@ -82,13 +82,13 @@ void keypad_sample() {
       if(key_down_time[index] < 0)
         key_down_time[index] = 0;
 
+      // Check if the button is being pressed
       if (GPIO_PinInGet(col_ports[col], col_pins[col])) {
         //The button is down
         key_down_time[index]++;
-      } else {
-        // Key is not pressed
-        if(key_down_time[index] > 0) // Flip the sign to indicte "was held this long"
-          key_down_time[index] = -key_down_time[index];
+      } else if (key_down_time[index] > 0) { // The button was just released
+        // Flip the sign to indicate "was held this long"
+        key_down_time[index] = -key_down_time[index];
       }
     }
     GPIO_PinOutClear(row_ports[row], row_pins[row]);
@@ -104,8 +104,9 @@ bool keypad_keypressed(int key) {
 }
 
 bool keypad_keyreleased(int key, int* was_down_frames) {
-  if(was_down_frames) {
-      *was_down_frames = -key_down_time[key] - MIN_HOLD_TIME + 1;
+  bool released = key_down_time[key] <= -MIN_HOLD_TIME;
+  if (released && was_down_frames) {
+    *was_down_frames = -key_down_time[key] - MIN_HOLD_TIME + 1;
   }
-  return key_down_time[key] <= -MIN_HOLD_TIME;
+  return released;
 }

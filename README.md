@@ -6,6 +6,16 @@ This repository contains the code for the MCU.
 
 Use [Simplicity Studio](https://www.silabs.com/developers/simplicity-studio).
 
+To build for the PCB, press the dropdown next to the hammer, and select
+`GNU ARM v10.3.1 - PCB - Debug`, and press the hammer.
+The finished build artifact will be `GNU ARM v10.3.1 - PCB - Debug/mcu.bin`,
+which can be flashed to hardware.
+
+## Simulating
+
+See the `sim/` folder and its README for a desktop app simulating the hardware
+enough to test user interfaces.
+
 ## Flashing
 
 Use Simplicity Studio, or download J-Link [from here](https://www.segger.com/downloads/jlink/)
@@ -15,7 +25,7 @@ Remember to set the development board to AEM before trying to flash.
 
 ### Flashing the MCU on the PCB
 This is done through a Giant Gecko Starter Kit.
-The general steps are described [here
+The general steps are described [here]
 (https://community.silabs.com/s/article/debugging-an-efm32-product-on-a-custom-board?language=en_US), and go like follows:
  - Use the Giant Gecko with a large 20-pin connector. The box is marked "Programmer" with a yellow Post-it.
  - Power on the PCB and the Giant Gecko Starter Kit (by connecting it to a PC).

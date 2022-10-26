@@ -9,8 +9,8 @@
 
 void debug_flush();
 void debug_printchar(char c);
-void debug_print(char* str);
-void debug_println(char* str);
+void debug_print(const char* str);
+void debug_println(const char* str);
 void debug_printintln(int i);
 void debug_printhexbyte(uint8_t byte);
 void debug_printhexbytesln(uint8_t* bytes, int len);

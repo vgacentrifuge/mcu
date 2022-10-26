@@ -6,25 +6,71 @@
     <property object="DefaultMode" propertyId="mode.diagramLocation" value="100, 100"/>
     <property object="I2C1" propertyId="ABModule.selectedRequirement" value="i2c%T%SL_I2CSPM_I2C1%T%sl_i2cspm_i2c1_config.h"/>
     <property object="I2C1" propertyId="ABPeripheral.included" value="true"/>
-    <property object="PA12" propertyId="pin.name" value="KEYPAD_ROW0"/>
-    <property object="PA12" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PA13" propertyId="pin.name" value="KEYPAD_ROW1"/>
-    <property object="PA13" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PA14" propertyId="pin.name" value="KEYPAD_ROW2"/>
+    <property object="PA0" propertyId="pin.name" value="FPGA_PROGRAM_B"/>
+    <property object="PA0" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA1" propertyId="pin.name" value="FPGA_INIT_B"/>
+    <property object="PA1" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA12" propertyId="pin.name" value=""/>
+    <property object="PA13" propertyId="pin.name" value=""/>
+    <property object="PA14" propertyId="pin.name" value="GPIO_LED0"/>
     <property object="PA14" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PB15" propertyId="pin.name" value="KEYPAD_ROW3"/>
-    <property object="PB15" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PE0" propertyId="pin.name" value="KEYPAD_COL0"/>
-    <property object="PE0" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PE1" propertyId="pin.name" value="KEYPAD_COL1"/>
-    <property object="PE1" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA15" propertyId="pin.name" value="FPGA_CONFIG_DONE"/>
+    <property object="PA15" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA3" propertyId="pin.name" value="GPIO_EXTRA_4"/>
+    <property object="PA3" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA5" propertyId="pin.name" value="GPIO_EXTRA_8"/>
+    <property object="PA5" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA6" propertyId="pin.name" value="GPIO_EXTRA_6"/>
+    <property object="PA6" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB1" propertyId="pin.name" value="GPIO_EXTRA_7"/>
+    <property object="PB1" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB15" propertyId="pin.name" value=""/>
+    <property object="PB5" propertyId="pin.name" value="GPIO_EXTRA_5"/>
+    <property object="PB5" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB6" propertyId="pin.name" value="GPIO_EXTRA_3"/>
+    <property object="PB6" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PC6" propertyId="pin.name" value="ADC1_DDC_SDA"/>
+    <property object="PC6" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PC7" propertyId="pin.name" value="ADC1_DDC_SCL"/>
+    <property object="PC7" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD0" propertyId="pin.name" value="ADC2_RESET"/>
+    <property object="PD0" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD1" propertyId="pin.name" value="ADC1_RESET"/>
+    <property object="PD1" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD10" propertyId="pin.name" value="GPIO_EXTRA_10"/>
+    <property object="PD10" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD6" propertyId="pin.name" value="ADC2_DDC_SDA"/>
+    <property object="PD6" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD7" propertyId="pin.name" value="ADC2_DDC_SCL"/>
+    <property object="PD7" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PE0" propertyId="pin.name" value=""/>
+    <property object="PE1" propertyId="pin.name" value=""/>
+    <property object="PE14" propertyId="pin.name" value="GPIO_EXTRA_11"/>
+    <property object="PE14" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PE15" propertyId="pin.name" value="GPIO_EXTRA_12"/>
+    <property object="PE15" propertyId="pin.reserve" value="Reserved"/>
     <property object="PE2" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_LED_LED0%T%sl_simple_led_led0_config.h"/>
-    <property object="PE2" propertyId="pin.name" value="KEYPAD_COL2"/>
-    <property object="PE2" propertyId="pin.reserve" value="Reserved"/>
-    <property object="PE3" propertyId="pin.name" value="KEYPAD_COL3"/>
-    <property object="PE3" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PE2" propertyId="pin.name" value=""/>
+    <property object="PE3" propertyId="pin.name" value=""/>
+    <property object="PE4" propertyId="pin.name" value="KEYPAD_COL3"/>
+    <property object="PE4" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PE5" propertyId="pin.name" value="KEYPAD_COL1"/>
+    <property object="PE5" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF10" propertyId="pin.name" value="KEYPAD_COL2"/>
+    <property object="PF10" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF11" propertyId="pin.name" value="KEYPAD_COL0"/>
+    <property object="PF11" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF12" propertyId="pin.name" value="KEYPAD_ROW0"/>
+    <property object="PF12" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF5" propertyId="pin.name" value="KEYPAD_ROW2"/>
+    <property object="PF5" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF6" propertyId="pin.name" value="KEYPAD_ROW1"/>
+    <property object="PF6" propertyId="pin.reserve" value="Reserved"/>
     <property object="PF7" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_BOARD_ENABLE_VCOM%T%sl_board_control_config.h"/>
+    <property object="PF7" propertyId="pin.name" value="GPIO_EXTRA_9"/>
     <property object="PF7" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PF8" propertyId="pin.name" value="KEYPAD_ROW3"/>
+    <property object="PF8" propertyId="pin.reserve" value="Reserved"/>
     <property object="PORTIO" propertyId="portio.dbg.enable.swo" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.i2c1.enable.scl" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.i2c1.enable.sda" value="Enabled"/>
@@ -32,15 +78,12 @@
     <property object="PORTIO" propertyId="portio.usart0.enable.cs" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart0.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart0.enable.tx" value="Enabled"/>
-    <property object="PORTIO" propertyId="portio.usart0.location.route" value="1"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.clk" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.cs" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
-    <property object="PORTIO" propertyId="portio.usart1.location.route" value="1"/>
-    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
     <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
-    <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_FPGA%T%sl_spidrv_fpga_config.h"/>
+    <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
     <property object="USART1" propertyId="ABPeripheral.included" value="true"/>
     <property object="USART2" propertyId="ABPeripheral.included" value="true"/>
   </mode>

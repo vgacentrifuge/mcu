@@ -209,26 +209,61 @@
 #define GPIO_EXTRA_10_PORT                       gpioPortD
 #define GPIO_EXTRA_10_PIN                        10
 
-#define KEYPAD_COL3_PORT                         gpioPortE
-#define KEYPAD_COL3_PIN                          4
-
-#define KEYPAD_COL1_PORT                         gpioPortE
-#define KEYPAD_COL1_PIN                          5
-
 #define GPIO_EXTRA_11_PORT                       gpioPortE
 #define GPIO_EXTRA_11_PIN                        14
 
 #define GPIO_EXTRA_12_PORT                       gpioPortE
 #define GPIO_EXTRA_12_PIN                        15
 
+
+#define GPIO_EXTRA_9_PORT                        gpioPortF
+#define GPIO_EXTRA_9_PIN                         7
+
+
+
+
+#define DEVBOARD                                 1
+#ifdef DEVBOARD
+
+// Defined to work with the devboard exposed pins
+
+#define KEYPAD_ROW0_PORT                         gpioPortD
+#define KEYPAD_ROW0_PIN                          2
+
+#define KEYPAD_ROW1_PORT                         gpioPortD
+#define KEYPAD_ROW1_PIN                          3
+
+#define KEYPAD_ROW2_PORT                         gpioPortD
+#define KEYPAD_ROW2_PIN                          4
+
+#define KEYPAD_ROW3_PORT                         gpioPortD
+#define KEYPAD_ROW3_PIN                          5
+
+#define KEYPAD_COL0_PORT                         gpioPortD
+#define KEYPAD_COL0_PIN                          8
+
+#define KEYPAD_COL1_PORT                         gpioPortD
+#define KEYPAD_COL1_PIN                          13
+
+#define KEYPAD_COL2_PORT                         gpioPortD
+#define KEYPAD_COL2_PIN                          14
+
+#define KEYPAD_COL3_PORT                         gpioPortD
+#define KEYPAD_COL3_PIN                          15
+
+#else
+
+#define KEYPAD_COL3_PORT                         gpioPortE
+#define KEYPAD_COL3_PIN                          4
+
+#define KEYPAD_COL1_PORT                         gpioPortE
+#define KEYPAD_COL1_PIN                          5
+
 #define KEYPAD_ROW2_PORT                         gpioPortF
 #define KEYPAD_ROW2_PIN                          5
 
 #define KEYPAD_ROW1_PORT                         gpioPortF
 #define KEYPAD_ROW1_PIN                          6
-
-#define GPIO_EXTRA_9_PORT                        gpioPortF
-#define GPIO_EXTRA_9_PIN                         7
 
 #define KEYPAD_ROW3_PORT                         gpioPortF
 #define KEYPAD_ROW3_PIN                          8
@@ -241,6 +276,8 @@
 
 #define KEYPAD_ROW0_PORT                         gpioPortF
 #define KEYPAD_ROW0_PIN                          12
+
+#endif
 
 // [CUSTOM_PIN_NAME]$
 

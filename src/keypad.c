@@ -8,6 +8,8 @@
  * Row 2: [ 8    9    10   11 ]
  * Row 3: [ 12   13   14   15 ]
  *
+ * Pins: [row0, row1, row2, row3, col0, col1, col2, col3]
+ *
  * The rows have resistors, so can safely be driven both high and low
  *
  * Wires are positioned in a grid, and each button will close the node.

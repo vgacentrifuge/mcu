@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "sl_sleeptimer.h"
-
+#include "sl_udelay.h"
 #include "debug.h"
 #include "board_io.h"
 #include "lcd.h"
@@ -90,10 +90,11 @@ void app_process_action(void)
   if (menu_dirty) {
     // We must redraw the menu on the LCD screen
     menu_dirty = false;
-    lcd_clear();
+    //lcd_clear();
     for (int i = 0; i < LCD_LINES; i++) {
-      lcd_set_cursor(1, i);
-      lcd_print(CHOICES[scroll+i]);
+      //lcd_set_cursor(1, i);
+      //lcd_print("Hei!");
+      //lcd_print(CHOICES[scroll+i]);
       marker_blink_timer = 0;
     }
   }
@@ -101,8 +102,8 @@ void app_process_action(void)
   if (marker_blink_timer % 20 == 0) {
     marker_blink_timer %= 40;
     bool show_marker = marker_blink_timer == 0;
-    lcd_set_cursor(0, choice-scroll);
-    lcd_print(show_marker ? ">" : " ");
+    //lcd_set_cursor(0, choice-scroll);
+    //lcd_print(show_marker ? ">" : " ");
   }
   marker_blink_timer++;
 

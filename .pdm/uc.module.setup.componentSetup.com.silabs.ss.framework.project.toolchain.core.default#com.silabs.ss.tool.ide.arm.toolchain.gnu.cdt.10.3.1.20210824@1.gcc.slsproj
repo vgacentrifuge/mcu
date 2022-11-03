@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="uc.module.setup.componentSetup.com.silabs.ss.framework.project.toolchain.core.default#com.silabs.ss.tool.ide.arm.toolchain.gnu.cdt:10.3.1.20210824@0.gcc" propertyScope="project">
+<project name="uc.module.setup.componentSetup.com.silabs.ss.framework.project.toolchain.core.default#com.silabs.ss.tool.ide.arm.toolchain.gnu.cdt:10.3.1.20210824@1.gcc" propertyScope="project">
   <folder name="gecko_sdk_4.1.3">
     <folder name="platform">
       <folder name="Device">
@@ -123,10 +123,14 @@
           <folder name="inc">
             <file name="sl_device_init_clocks.h" uri="studio:/sdk/platform/service/device_init/inc/sl_device_init_clocks.h"/>
             <file name="sl_device_init_emu.h" uri="studio:/sdk/platform/service/device_init/inc/sl_device_init_emu.h"/>
+            <file name="sl_device_init_hfxo.h" uri="studio:/sdk/platform/service/device_init/inc/sl_device_init_hfxo.h"/>
+            <file name="sl_device_init_lfxo.h" uri="studio:/sdk/platform/service/device_init/inc/sl_device_init_lfxo.h"/>
             <file name="sl_device_init_nvic.h" uri="studio:/sdk/platform/service/device_init/inc/sl_device_init_nvic.h"/>
           </folder>
           <folder name="src">
             <file name="sl_device_init_emu_s0.c" uri="studio:/sdk/platform/service/device_init/src/sl_device_init_emu_s0.c"/>
+            <file name="sl_device_init_hfxo_s0.c" uri="studio:/sdk/platform/service/device_init/src/sl_device_init_hfxo_s0.c"/>
+            <file name="sl_device_init_lfxo_s0.c" uri="studio:/sdk/platform/service/device_init/src/sl_device_init_lfxo_s0.c"/>
             <file name="sl_device_init_nvic.c" uri="studio:/sdk/platform/service/device_init/src/sl_device_init_nvic.c"/>
           </folder>
         </folder>
@@ -223,6 +227,18 @@
         </folder>
       </folder>
     </folder>
+    <folder name="hardware">
+      <folder name="board">
+        <folder name="src">
+          <file name="sl_board_init.c" uri="studio:/sdk/hardware/board/src/sl_board_init.c"/>
+          <file name="sl_board_control_gpio.c" uri="studio:/sdk/hardware/board/src/sl_board_control_gpio.c"/>
+        </folder>
+        <folder name="inc">
+          <file name="sl_board_control.h" uri="studio:/sdk/hardware/board/inc/sl_board_control.h"/>
+          <file name="sl_board_init.h" uri="studio:/sdk/hardware/board/inc/sl_board_init.h"/>
+        </folder>
+      </folder>
+    </folder>
   </folder>
   <file name="app.h" linked="false" uri="studio:/project/app.h"/>
   <file name="blink.h" linked="false" uri="studio:/project/blink.h"/>
@@ -230,6 +246,7 @@
   <includePath uri="studio:/project/"/>
   <includePath uri="studio:/sdk/platform/Device/SiliconLabs/EFM32GG/Include"/>
   <includePath uri="studio:/sdk/platform/common/inc"/>
+  <includePath uri="studio:/sdk/hardware/board/inc"/>
   <includePath uri="studio:/sdk/platform/CMSIS/Core/Include"/>
   <includePath uri="studio:/sdk/platform/driver/debug/inc"/>
   <includePath uri="studio:/sdk/platform/service/device_init/inc"/>
@@ -244,6 +261,8 @@
   <includePath uri="studio:/sdk/platform/service/udelay/inc"/>
   <macroDefinition name="DEBUG_EFM"/>
   <macroDefinition name="EFM32GG990F1024"/>
+  <macroDefinition name="SL_BOARD_NAME" value="&quot;BRD2200A&quot;"/>
+  <macroDefinition name="SL_BOARD_REV" value="&quot;B05&quot;"/>
   <macroDefinition name="SL_COMPONENT_CATALOG_PRESENT"/>
   <libraryFile name="gcc"/>
   <libraryFile name="c"/>

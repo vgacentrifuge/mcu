@@ -24,11 +24,13 @@
 void app_init(void)
 {
   board_io_init();
+  board_io_set_led0(1);
   fpga_spi_init();
   sd_card_init();
   keypad_init();
   adcs_init();
   lcd_init();
+  board_io_set_led0(0);
 
   if (sd_card_is_mounted()) {
     static direntry_t entries[32];

@@ -19,43 +19,46 @@ void update_ui_options();
 
 static int ui_mixing_blinker;
 void open_ui_mixing() {
-    ui_state = UI_MIXING;
+  ui_state = UI_MIXING;
 
-    ui_mixing_blinker = 0;
+  ui_mixing_blinker = 0;
 
-    lcd_clear();
-    lcd_print("Curr state: TODO");
+  lcd_clear();
+  lcd_print("Curr state: TODO");
 }
 
 void update_ui_mixing() {
-    if(++ui_mixing_blinker % 15 == 0) {
-        lcd_set_cursor(LCD_COLUMNS-1, 0);
-        lcd_print(ui_mixing_blinker%2 ? "X":" ");
-        ui_mixing_blinker %= 30;
-    }
+  if(++ui_mixing_blinker % 15 == 0) {
+    lcd_set_cursor(LCD_COLUMNS-1, 0);
+    lcd_print(ui_mixing_blinker%2 ? "X":" ");
+    ui_mixing_blinker %= 30;
+  }
 
-    if(keypad_keypressed(KEY_UP))
-        open_ui_options();
+  if(keypad_keypressed(KEY_UP))
+    open_ui_options();
 }
 
 void open_ui_options() {
-    ui_state = UI_OPTIONS;
-    lcd_clear();
-    lcd_print("      MENU      ");
+  ui_state = UI_OPTIONS;
+  lcd_clear();
+  lcd_print("      MENU      ");
 }
 
 void update_ui_options() {
-    if(keypad_keypressed(KEY_DOWN))
-        open_ui_mixing();
+  if(keypad_keypressed(KEY_DOWN))
+    open_ui_mixing();
 }
 
 void ui_update() {
-    switch(ui_state) {
-        case UI_INIT:
-            open_ui_mixing();
-        case UI_MIXING:
-            update_ui_mixing();
-        case UI_OPTIONS:
-            update_ui_options();
-    }
+  switch(ui_state) {
+    case UI_INIT:
+      open_ui_mixing();
+      break;
+    case UI_MIXING:
+      update_ui_mixing();
+      break;
+    case UI_OPTIONS:
+      update_ui_options();
+      break;
+  }
 }

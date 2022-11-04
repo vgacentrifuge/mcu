@@ -5,6 +5,7 @@ sl_board_control_config.h=622062623
 sl_debug_swo_config.h=-1703642692
 sl_device_init_hfxo_config.h=-1774902859
 sl_device_init_lfxo_config.h=1460862873
+sl_i2cspm_i2c0_eeproms_config.h=-310910276
 sl_i2cspm_i2c1_config.h=538110376
 sl_memory_config.h=-995392215
 sl_simple_led_led0_config.h=-219882604

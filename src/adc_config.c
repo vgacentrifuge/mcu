@@ -39,8 +39,8 @@ void write_register(uint8_t address, uint8_t reg, uint8_t value) {
   };
   int ret = I2CSPM_Transfer(I2C, &transfer);
   if (ret != 0) {
-    char out[24];
-    snprintf(out, sizeof(out), "ADC write fail: %d", ret);
+    char out[30];
+    snprintf(out, sizeof(out), "ADC %x write fail: %d", address, ret);
     debug_println(out);
   }
 }

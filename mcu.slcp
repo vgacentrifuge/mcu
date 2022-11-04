@@ -36,7 +36,6 @@ component:
   id: spidrv
 - {id: debug_swo}
 - {id: sleeptimer}
-- {id: brd2200a}
 - {id: EFM32GG990F1024}
 define:
 - {name: DEBUG_EFM}

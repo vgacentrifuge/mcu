@@ -82,6 +82,7 @@
     <property object="PORTIO" propertyId="portio.usart1.enable.cs" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
+    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_FPGA%T%sl_spidrv_fpga_config.h"/>
     <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
     <property object="USART1" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_SD_CARD%T%sl_spidrv_sd_card_config.h"/>
     <property object="USART1" propertyId="ABPeripheral.included" value="true"/>

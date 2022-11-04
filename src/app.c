@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "sl_sleeptimer.h"
-
+#include "sl_udelay.h"
 #include "debug.h"
 #include "board_io.h"
 #include "lcd.h"
@@ -34,10 +34,10 @@ static uint32_t NUM_CHOICES = 6;
 void app_init(void)
 {
   board_io_init();
-  lcd_init();
   fpga_spi_init();
   sd_card_init();
   keypad_init();
+  lcd_init();
 
   if (sd_card_is_mounted()) {
     static direntry_t entries[32];

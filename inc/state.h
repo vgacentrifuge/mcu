@@ -3,6 +3,15 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#include "lcd.h"
+
+#define CHOICE_SCREEN_WIDTH (LCD_COLUMNS-2)
+
+typedef struct {
+  char key[CHOICE_SCREEN_WIDTH];
+  int val;
+} choice_t;
+
 struct State {
   uint16_t width;
   uint16_t height;
@@ -11,7 +20,8 @@ struct State {
       fg_x_offset,
       fg_y_offset;
 
-  char current_menu[20];
+  choice_t current_menu;
+  bool just_switched;
 
   uint8_t fg_scale;
   uint8_t fg_blend_mode;

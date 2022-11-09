@@ -46,6 +46,8 @@ void write_register(uint8_t address, uint8_t reg, uint8_t value) {
 }
 
 void configure_adc(uint8_t address) {
+  // See ADC datasheet: https://www.ti.com/lit/ds/symlink/tvp7002.pdf
+
   // For SVGA 800x600 @ 60.317Hz, taken from the chart in the datasheet
   uint16_t pixels_per_line = 1056;
   write_register(address, 0x01, pixels_per_line>>4); // pixels per line [11:4]
@@ -96,7 +98,9 @@ void configure_adc(uint8_t address) {
   write_register(address, 0x19, 0x00); // Input MUX select, we use RIN_1, GIN_1, BIN_1
   write_register(address, 0x1A, 0xCA); // Input MUX select 2 VSYNC_A and HSYNC_A. Changed to use EXT_CLK for Sync Processing
 
-  write_register(address, 0x21, 0x00); // HSOUT Output Start delay (in pixel clock cycles). +5 cycles
+  // HSOUT Output Start delay (in pixel clock cycles). + 5 extra cycles
+  // Since RGB is 18 cycles delayed, there is a 18-5=13 cycle head start to the hsync signal
+  write_register(address, 0x21, 0x0);
 
   const uint8_t MAC_EN = 0; // No "Macrovision", thank you
   const uint8_t COAST_DISABLE = 1; // We hopefully dont need coast when we have 5 wires.

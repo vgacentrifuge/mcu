@@ -2,6 +2,7 @@
 #include "lcd.h"
 #include "keypad.h"
 #include "debug.h"
+#include "ddc_data.h"
 
 // Before anything has been shown. A state that immediatly jumps to MENU_MIXING
 #define UI_INIT -1
@@ -47,6 +48,14 @@ void open_ui_options() {
 void update_ui_options() {
   if(keypad_keypressed(KEY_DOWN))
     open_ui_mixing();
+  if(keypad_keypressed(KEY_INDEX(0,0))) {
+    open_ui_mixing();
+    flash_ddc_eeprom(DDC_EEPROM1);
+  }
+  if(keypad_keypressed(KEY_INDEX(1,0))) {
+    open_ui_mixing();
+    flash_ddc_eeprom(DDC_EEPROM2);
+  }
 }
 
 void ui_update() {

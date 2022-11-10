@@ -60,12 +60,12 @@ I2CSPM_Init_TypeDef init_eeprom1 = {
 };
 
 I2CSPM_Init_TypeDef init_eeprom2 = {
-  .port = I2C_EEPROM1_PERIPHERAL,
-  .sclPort = I2C_EEPROM1_SCL_PORT,
-  .sclPin = I2C_EEPROM1_SCL_PIN,
-  .sdaPort = I2C_EEPROM1_SDA_PORT,
-  .sdaPin = I2C_EEPROM1_SDA_PIN,
-  .portLocation = I2C_EEPROM1_ROUTE_LOC,
+  .port = I2C_EEPROM2_PERIPHERAL,
+  .sclPort = I2C_EEPROM2_SCL_PORT,
+  .sclPin = I2C_EEPROM2_SCL_PIN,
+  .sdaPort = I2C_EEPROM2_SDA_PORT,
+  .sdaPin = I2C_EEPROM2_SDA_PIN,
+  .portLocation = I2C_EEPROM2_ROUTE_LOC,
 
   .i2cRefFreq = 0,
   .i2cMaxFreq = I2CSPM_MAX_FREQ,

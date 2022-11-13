@@ -24,6 +24,13 @@ void lcd_clear() {
 }
 
 /**
+ * Writes to lcd
+ */
+void lcd_write(uint8_t data) {
+  DFR_write(data);
+}
+
+/**
  * Moves the cursor to the top right corner, aka (0,0)
  */
 void lcd_home() {
@@ -36,4 +43,11 @@ void lcd_home() {
  */
 void lcd_set_cursor(uint8_t col, uint8_t line) {
   DFR_setCursor(col, line);
+}
+
+/**
+ * Creates custom symbol
+ */
+void lcd_custom_symbol(uint8_t char_num, uint8_t* rows) {
+  DFR_custom_symbol(char_num, rows);
 }

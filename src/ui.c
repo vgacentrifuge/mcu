@@ -4,19 +4,34 @@
 #include "debug.h"
 #include "ddc_data.h"
 
-// Before anything has been shown. A state that immediatly jumps to MENU_MIXING
-#define UI_INIT -1
-// The default screen, letting the user modify the current state using buttons
-#define UI_MIXING 0
-// A list of options, for doing more advanced things
-#define UI_OPTIONS 1
+enum {
+  UI_TRANSITION, // Lets the lcd freeze before switching mode
+  UI_MIXING, // The default mixing view
+  UI_OPTIONS,
+};
 
-static int ui_state = UI_INIT;
+static int ui_state = UI_TRANSITION;
 
 void open_ui_mixing();
 void update_ui_mixing();
 void open_ui_options();
 void update_ui_options();
+
+// Default is to instantly transition to UI mixing
+static int ui_transition_frames_left = 0;
+static void (*ui_transition_callback)() = open_ui_mixing;
+
+void open_ui_transition(int frames, void (*callback)()) {
+  ui_transition_frames_left = frames;
+  ui_transition_callback = callback;
+}
+
+void update_ui_transition() {
+  if(ui_transition_frames_left <= 0)
+    ui_transition_callback();
+  else
+    ui_transition_frames_left--;
+}
 
 static int ui_mixing_blinker;
 void open_ui_mixing() {

@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "sl_sleeptimer.h"
-#include "sl_udelay.h"
 #include "debug.h"
 #include "board_io.h"
 #include "lcd.h"
@@ -30,6 +29,7 @@ void app_init(void)
   keypad_init();
   adcs_init();
   lcd_init();
+  ui_init();
   board_io_set_led0(0);
 
   if (sd_card_is_mounted()) {

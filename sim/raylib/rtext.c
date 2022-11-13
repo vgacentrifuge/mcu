@@ -58,7 +58,7 @@
 
 #if defined(SUPPORT_MODULE_RTEXT)
 
-#include "utils.h"          // Required for: LoadFileText()
+#include "utils.h"          // Required for: LoadFile*()
 #include "rlgl.h"           // OpenGL abstraction layer to OpenGL 1.1, 2.1, 3.3+ or ES2 -> Only DrawTextPro()
 
 #include <stdlib.h>         // Required for: malloc(), free()
@@ -359,7 +359,7 @@ Font LoadFontEx(const char *fileName, int fontSize, int *fontChars, int glyphCou
         // Loading font from memory data
         font = LoadFontFromMemory(GetFileExtension(fileName), fileData, fileSize, fontSize, fontChars, glyphCount);
 
-        RL_FREE(fileData);
+        UnloadFileData(fileData);
     }
     else font = GetFontDefault();
 
@@ -818,9 +818,12 @@ Image GenImageFontAtlas(const GlyphInfo *chars, Rectangle **charRecs, int glyphC
 // Unload font glyphs info data (RAM)
 void UnloadFontData(GlyphInfo *glyphs, int glyphCount)
 {
-    for (int i = 0; i < glyphCount; i++) UnloadImage(glyphs[i].image);
+    if (glyphs != NULL)
+    {
+        for (int i = 0; i < glyphCount; i++) UnloadImage(glyphs[i].image);
 
-    RL_FREE(glyphs);
+        RL_FREE(glyphs);
+    }
 }
 
 // Unload Font from GPU memory (VRAM)
@@ -1040,7 +1043,7 @@ void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, f
     {
         // Get next codepoint from byte string and glyph index in font
         int codepointByteCount = 0;
-        int codepoint = GetCodepoint(&text[i], &codepointByteCount);
+        int codepoint = GetCodepointNext(&text[i], &codepointByteCount);
         int index = GetGlyphIndex(font, codepoint);
 
         // NOTE: Normally we exit the decoding sequence as soon as a bad byte is found (and return 0x3f)
@@ -1142,7 +1145,7 @@ void DrawTextCodepoints(Font font, const int *codepoints, int count, Vector2 pos
 // Measure string width for default font
 int MeasureText(const char *text, int fontSize)
 {
-    Vector2 vec = { 0.0f, 0.0f };
+    Vector2 textSize = { 0.0f, 0.0f };
 
     // Check if default font has been loaded
     if (GetFontDefault().texture.id != 0)
@@ -1151,15 +1154,19 @@ int MeasureText(const char *text, int fontSize)
         if (fontSize < defaultFontSize) fontSize = defaultFontSize;
         int spacing = fontSize/defaultFontSize;
 
-        vec = MeasureTextEx(GetFontDefault(), text, (float)fontSize, (float)spacing);
+        textSize = MeasureTextEx(GetFontDefault(), text, (float)fontSize, (float)spacing);
     }
 
-    return (int)vec.x;
+    return (int)textSize.x;
 }
 
 // Measure string size for Font
 Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
 {
+    Vector2 textSize = { 0 };
+
+    if ((font.texture.id == 0) || (text == NULL)) return textSize;
+
     int size = TextLength(text);    // Get size in bytes of text
     int tempByteCounter = 0;        // Used to count longer text line num chars
     int byteCounter = 0;
@@ -1178,7 +1185,7 @@ Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing
         byteCounter++;
 
         int next = 0;
-        letter = GetCodepoint(&text[i], &next);
+        letter = GetCodepointNext(&text[i], &next);
         index = GetGlyphIndex(font, letter);
 
         // NOTE: normally we exit the decoding sequence as soon as a bad byte is found (and return 0x3f)
@@ -1204,11 +1211,10 @@ Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing
 
     if (tempTextWidth < textWidth) tempTextWidth = textWidth;
 
-    Vector2 vec = { 0 };
-    vec.x = tempTextWidth*scaleFactor + (float)((tempByteCounter - 1)*spacing); // Adds chars spacing to measure
-    vec.y = textHeight*scaleFactor;
+    textSize.x = tempTextWidth*scaleFactor + (float)((tempByteCounter - 1)*spacing); // Adds chars spacing to measure
+    textSize.y = textHeight*scaleFactor;
 
-    return vec;
+    return textSize;
 }
 
 // Get index position for a unicode character on font
@@ -1621,7 +1627,7 @@ const char *TextToPascal(const char *text)
 // Encode text codepoint into UTF-8 text
 // REQUIRES: memcpy()
 // WARNING: Allocated memory must be manually freed
-char *TextCodepointsToUTF8(const int *codepoints, int length)
+char *LoadUTF8(const int *codepoints, int length)
 {
     // We allocate enough memory fo fit all possible codepoints
     // NOTE: 5 bytes for every codepoint should be enough
@@ -1644,9 +1650,68 @@ char *TextCodepointsToUTF8(const int *codepoints, int length)
     return text;
 }
 
+// Unload UTF-8 text encoded from codepoints array
+void UnloadUTF8(char *text)
+{
+    RL_FREE(text);
+}
+
+// Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+int *LoadCodepoints(const char *text, int *count)
+{
+    int textLength = TextLength(text);
+
+    int codepointSize = 0;
+    int codepointCount = 0;
+
+    // Allocate a big enough buffer to store as many codepoints as text bytes
+    int *codepoints = RL_CALLOC(textLength, sizeof(int));
+
+    for (int i = 0; i < textLength; codepointCount++)
+    {
+        codepoints[codepointCount] = GetCodepointNext(text + i, &codepointSize);
+        i += codepointSize;
+    }
+
+    // Re-allocate buffer to the actual number of codepoints loaded
+    void *temp = RL_REALLOC(codepoints, codepointCount*sizeof(int));
+    if (temp != NULL) codepoints = temp;
+
+    *count = codepointCount;
+
+    return codepoints;
+}
+
+// Unload codepoints data from memory
+void UnloadCodepoints(int *codepoints)
+{
+    RL_FREE(codepoints);
+}
+
+// Get total number of characters(codepoints) in a UTF-8 encoded text, until '\0' is found
+// NOTE: If an invalid UTF-8 sequence is encountered a '?'(0x3f) codepoint is counted instead
+int GetCodepointCount(const char *text)
+{
+    unsigned int length = 0;
+    char *ptr = (char *)&text[0];
+
+    while (*ptr != '\0')
+    {
+        int next = 0;
+        int letter = GetCodepointNext(ptr, &next);
+
+        if (letter == 0x3f) ptr += 1;
+        else ptr += next;
+
+        length++;
+    }
+
+    return length;
+}
+
 // Encode codepoint into utf8 text (char array length returned as parameter)
 // NOTE: It uses a static array to store UTF-8 bytes
-RLAPI const char *CodepointToUTF8(int codepoint, int *byteSize)
+const char *CodepointToUTF8(int codepoint, int *utf8Size)
 {
     static char utf8[6] = { 0 };
     int size = 0;   // Byte size of codepoint
@@ -1678,62 +1743,9 @@ RLAPI const char *CodepointToUTF8(int codepoint, int *byteSize)
         size = 4;
     }
 
-    *byteSize = size;
+    *utf8Size = size;
 
     return utf8;
-}
-
-// Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
-int *LoadCodepoints(const char *text, int *count)
-{
-    int textLength = TextLength(text);
-
-    int bytesProcessed = 0;
-    int codepointCount = 0;
-
-    // Allocate a big enough buffer to store as many codepoints as text bytes
-    int *codepoints = RL_CALLOC(textLength, sizeof(int));
-
-    for (int i = 0; i < textLength; codepointCount++)
-    {
-        codepoints[codepointCount] = GetCodepoint(text + i, &bytesProcessed);
-        i += bytesProcessed;
-    }
-
-    // Re-allocate buffer to the actual number of codepoints loaded
-    void *temp = RL_REALLOC(codepoints, codepointCount*sizeof(int));
-    if (temp != NULL) codepoints = temp;
-
-    *count = codepointCount;
-
-    return codepoints;
-}
-
-// Unload codepoints data from memory
-void UnloadCodepoints(int *codepoints)
-{
-    RL_FREE(codepoints);
-}
-
-// Get total number of characters(codepoints) in a UTF-8 encoded text, until '\0' is found
-// NOTE: If an invalid UTF-8 sequence is encountered a '?'(0x3f) codepoint is counted instead
-int GetCodepointCount(const char *text)
-{
-    unsigned int length = 0;
-    char *ptr = (char *)&text[0];
-
-    while (*ptr != '\0')
-    {
-        int next = 0;
-        int letter = GetCodepoint(ptr, &next);
-
-        if (letter == 0x3f) ptr += 1;
-        else ptr += next;
-
-        length++;
-    }
-
-    return length;
 }
 #endif      // SUPPORT_TEXT_MANIPULATION
 
@@ -1742,7 +1754,7 @@ int GetCodepointCount(const char *text)
 // Total number of bytes processed are returned as a parameter
 // NOTE: The standard says U+FFFD should be returned in case of errors
 // but that character is not supported by the default font in raylib
-int GetCodepoint(const char *text, int *bytesProcessed)
+int GetCodepoint(const char *text, int *codepointSize)
 {
 /*
     UTF-8 specs from https://www.ietf.org/rfc/rfc3629.txt
@@ -1757,14 +1769,14 @@ int GetCodepoint(const char *text, int *bytesProcessed)
 */
     // NOTE: on decode errors we return as soon as possible
 
-    int code = 0x3f;   // Codepoint (defaults to '?')
+    int codepoint = 0x3f;   // Codepoint (defaults to '?')
     int octet = (unsigned char)(text[0]); // The first UTF8 octet
-    *bytesProcessed = 1;
+    *codepointSize = 1;
 
     if (octet <= 0x7f)
     {
         // Only one octet (ASCII range x00-7F)
-        code = text[0];
+        codepoint = text[0];
     }
     else if ((octet & 0xe0) == 0xc0)
     {
@@ -1773,12 +1785,12 @@ int GetCodepoint(const char *text, int *bytesProcessed)
         // [0]xC2-DF    [1]UTF8-tail(x80-BF)
         unsigned char octet1 = text[1];
 
-        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *bytesProcessed = 2; return code; } // Unexpected sequence
+        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *codepointSize = 2; return codepoint; } // Unexpected sequence
 
         if ((octet >= 0xc2) && (octet <= 0xdf))
         {
-            code = ((octet & 0x1f) << 6) | (octet1 & 0x3f);
-            *bytesProcessed = 2;
+            codepoint = ((octet & 0x1f) << 6) | (octet1 & 0x3f);
+            *codepointSize = 2;
         }
     }
     else if ((octet & 0xf0) == 0xe0)
@@ -1787,11 +1799,11 @@ int GetCodepoint(const char *text, int *bytesProcessed)
         unsigned char octet1 = text[1];
         unsigned char octet2 = '\0';
 
-        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *bytesProcessed = 2; return code; } // Unexpected sequence
+        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *codepointSize = 2; return codepoint; } // Unexpected sequence
 
         octet2 = text[2];
 
-        if ((octet2 == '\0') || ((octet2 >> 6) != 2)) { *bytesProcessed = 3; return code; } // Unexpected sequence
+        if ((octet2 == '\0') || ((octet2 >> 6) != 2)) { *codepointSize = 3; return codepoint; } // Unexpected sequence
 
         // [0]xE0    [1]xA0-BF       [2]UTF8-tail(x80-BF)
         // [0]xE1-EC [1]UTF8-tail    [2]UTF8-tail(x80-BF)
@@ -1799,50 +1811,105 @@ int GetCodepoint(const char *text, int *bytesProcessed)
         // [0]xEE-EF [1]UTF8-tail    [2]UTF8-tail(x80-BF)
 
         if (((octet == 0xe0) && !((octet1 >= 0xa0) && (octet1 <= 0xbf))) ||
-            ((octet == 0xed) && !((octet1 >= 0x80) && (octet1 <= 0x9f)))) { *bytesProcessed = 2; return code; }
+            ((octet == 0xed) && !((octet1 >= 0x80) && (octet1 <= 0x9f)))) { *codepointSize = 2; return codepoint; }
 
         if ((octet >= 0xe0) && (octet <= 0xef))
         {
-            code = ((octet & 0xf) << 12) | ((octet1 & 0x3f) << 6) | (octet2 & 0x3f);
-            *bytesProcessed = 3;
+            codepoint = ((octet & 0xf) << 12) | ((octet1 & 0x3f) << 6) | (octet2 & 0x3f);
+            *codepointSize = 3;
         }
     }
     else if ((octet & 0xf8) == 0xf0)
     {
         // Four octets
-        if (octet > 0xf4) return code;
+        if (octet > 0xf4) return codepoint;
 
         unsigned char octet1 = text[1];
         unsigned char octet2 = '\0';
         unsigned char octet3 = '\0';
 
-        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *bytesProcessed = 2; return code; }  // Unexpected sequence
+        if ((octet1 == '\0') || ((octet1 >> 6) != 2)) { *codepointSize = 2; return codepoint; }  // Unexpected sequence
 
         octet2 = text[2];
 
-        if ((octet2 == '\0') || ((octet2 >> 6) != 2)) { *bytesProcessed = 3; return code; }  // Unexpected sequence
+        if ((octet2 == '\0') || ((octet2 >> 6) != 2)) { *codepointSize = 3; return codepoint; }  // Unexpected sequence
 
         octet3 = text[3];
 
-        if ((octet3 == '\0') || ((octet3 >> 6) != 2)) { *bytesProcessed = 4; return code; }  // Unexpected sequence
+        if ((octet3 == '\0') || ((octet3 >> 6) != 2)) { *codepointSize = 4; return codepoint; }  // Unexpected sequence
 
         // [0]xF0       [1]x90-BF       [2]UTF8-tail  [3]UTF8-tail
         // [0]xF1-F3    [1]UTF8-tail    [2]UTF8-tail  [3]UTF8-tail
         // [0]xF4       [1]x80-8F       [2]UTF8-tail  [3]UTF8-tail
 
         if (((octet == 0xf0) && !((octet1 >= 0x90) && (octet1 <= 0xbf))) ||
-            ((octet == 0xf4) && !((octet1 >= 0x80) && (octet1 <= 0x8f)))) { *bytesProcessed = 2; return code; } // Unexpected sequence
+            ((octet == 0xf4) && !((octet1 >= 0x80) && (octet1 <= 0x8f)))) { *codepointSize = 2; return codepoint; } // Unexpected sequence
 
         if (octet >= 0xf0)
         {
-            code = ((octet & 0x7) << 18) | ((octet1 & 0x3f) << 12) | ((octet2 & 0x3f) << 6) | (octet3 & 0x3f);
-            *bytesProcessed = 4;
+            codepoint = ((octet & 0x7) << 18) | ((octet1 & 0x3f) << 12) | ((octet2 & 0x3f) << 6) | (octet3 & 0x3f);
+            *codepointSize = 4;
         }
     }
 
-    if (code > 0x10ffff) code = 0x3f;     // Codepoints after U+10ffff are invalid
+    if (codepoint > 0x10ffff) codepoint = 0x3f;     // Codepoints after U+10ffff are invalid
 
-    return code;
+    return codepoint;
+}
+
+// Get next codepoint in a byte sequence and bytes processed
+int GetCodepointNext(const char *text, int *codepointSize)
+{
+    const char *ptr = text;
+    int codepoint = 0x3f;       // Codepoint (defaults to '?')
+    *codepointSize = 0;
+    
+    // Get current codepoint and bytes processed
+    if (0xf0 == (0xf8 & ptr[0]))
+    {
+        // 4 byte UTF-8 codepoint
+        codepoint = ((0x07 & ptr[0]) << 18) | ((0x3f & ptr[1]) << 12) | ((0x3f & ptr[2]) << 6) | (0x3f & ptr[3]);
+        *codepointSize = 4;
+    }
+    else if (0xe0 == (0xf0 & ptr[0]))
+    {
+        // 3 byte UTF-8 codepoint */
+        codepoint = ((0x0f & ptr[0]) << 12) | ((0x3f & ptr[1]) << 6) | (0x3f & ptr[2]);
+        *codepointSize = 3;
+    } 
+    else if (0xc0 == (0xe0 & ptr[0]))
+    {
+        // 2 byte UTF-8 codepoint
+        codepoint = ((0x1f & ptr[0]) << 6) | (0x3f & ptr[1]);
+        *codepointSize = 2;
+    } 
+    else
+    {
+        // 1 byte UTF-8 codepoint
+        codepoint = ptr[0];
+        *codepointSize = 1;
+    }
+    
+    return codepoint;
+}
+
+// Get previous codepoint in a byte sequence and bytes processed
+int GetCodepointPrevious(const char *text, int *codepointSize)
+{
+    const char *ptr = text;
+    int codepoint = 0x3f;       // Codepoint (defaults to '?')
+    int cpSize = 0;
+    *codepointSize = 0;
+
+    // Move to previous codepoint
+    do ptr--;
+    while (((0x80 & ptr[0]) != 0) && ((0xc0 & ptr[0]) ==  0x80));
+    
+    codepoint = GetCodepointNext(ptr, &cpSize);
+
+    if (codepoint != 0) *codepointSize = cpSize;
+
+    return codepoint;
 }
 
 //----------------------------------------------------------------------------------

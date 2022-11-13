@@ -27,10 +27,8 @@ void open_ui_transition(int frames, void (*callback)()) {
 }
 
 void update_ui_transition() {
-  if(ui_transition_frames_left <= 0)
+  if(ui_transition_frames_left-- <= 0)
     ui_transition_callback();
-  else
-    ui_transition_frames_left--;
 }
 
 static int ui_mixing_blinker;
@@ -75,8 +73,8 @@ void update_ui_options() {
 
 void ui_update() {
   switch(ui_state) {
-    case UI_INIT:
-      open_ui_mixing();
+    case UI_TRANSITION:
+      update_ui_transition();
       break;
     case UI_MIXING:
       update_ui_mixing();

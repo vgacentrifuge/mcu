@@ -1,7 +1,7 @@
 
 CC:=zig cc
 
-CFLAGS:=$(CFLAGS) -Wall -Wextra -O2 -Iraylib -I../inc -I../vendored -I. -g
+CFLAGS:=$(CFLAGS) -Wall -Wextra -O2 -Iraylib -I../inc -I../vendored -Iinc -g
 LDFLAGS:=$(LDFLAGS) -Wall -Wextra -O2 -Lraylib -g
 
 BUILD_DIR:=build
@@ -9,10 +9,10 @@ BUILD_DIR:=build
 # These are the files from the actual codebase that get included in our sim
 SRC_FILES:=../src/app.c ../src/debug.c ../src/ui.c
 # Files belonging to the sim
-SIM_FILES:=$(wildcard *.c)
+SIM_FILES:=$(wildcard src/*.c)
 
-SIM_OBJECT_FILES:=$(patsubst %.c,$(BUILD_DIR)/sim/%.o,$(SIM_FILES))
-SRC_OBJECT_FILES:=$(patsubst %.c,$(BUILD_DIR)/sim/%.o,$(SRC_FILES))
+SIM_OBJECT_FILES:=$(patsubst src/%.c,$(BUILD_DIR)/sim/%.o,$(SIM_FILES))
+SRC_OBJECT_FILES:=$(patsubst ../src/%.c,$(BUILD_DIR)/src/%.o,$(SRC_FILES))
 
 RAYLIB_FILE:=raylib/libraylib.a
 
@@ -26,7 +26,7 @@ $(BUILD_DIR)/mcu_sim: $(SIM_OBJECT_FILES) $(SRC_OBJECT_FILES) $(RAYLIB_FILE)
 $(BUILD_DIR)/src/%.o: ../src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/sim/%.o: %.c
+$(BUILD_DIR)/sim/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(RAYLIB_FILE):

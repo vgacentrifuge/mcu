@@ -43,7 +43,7 @@ void ui_init(void)
   current_mixing_state = 0;
 
   // We immediately transition into the mixing state
-  open_ui_transition(0, &ui_open_mixing);
+  ui_open_transition(0, &ui_open_mixing);
 }
 
 static int ui_transition_frames_left;
@@ -91,7 +91,7 @@ void ui_open_mixing() {
   lcd_print(buff);
 
   lcd_set_cursor(3, 1);
-  switch (CURR_STATE.fg_blend_mode) {
+  switch (CURR_STATE.fg_scale) {
     case FG_SCALE_100:  lcd_print("SC100%"); break;
     case FG_SCALE_50:   lcd_print("SC 50%"); break;
     case FG_SCALE_25:   lcd_print("SC 25%"); break;
@@ -108,76 +108,72 @@ void ui_update_mixing() {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
       CURR_STATE.fg_y_offset--;
     }
-    open_ui_mixing();
+    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
        CURR_STATE.fg_y_offset++;
     }
-    open_ui_mixing();
+    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_LEFT)) {
     if (CURR_STATE.fg_y_offset > MIN_X_VAL) {
        CURR_STATE.fg_x_offset--;
     }
-    open_ui_mixing();
+    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_RIGHT)) {
     if (CURR_STATE.fg_y_offset < MAX_X_VAL) {
        CURR_STATE.fg_x_offset++;
     }
-    open_ui_mixing();
+    ui_open_mixing();
   }
 
   if (keypad_keypressed(MENU_KEY)) {
-     open_ui_options();
+     ui_open_options();
   }
 
-  if (keypad_keypressed(CHROMA_KEY))
-  {
+  if (keypad_keypressed(CHROMA_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
-    open_ui_mixing();
+    ui_open_mixing();
   }
-  if (keypad_keypressed(OVERLAY_KEY))
-  {
+  if (keypad_keypressed(OVERLAY_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_NORMAL;
-    open_ui_mixing();
+    ui_open_mixing();
   }
-  if (keypad_keypressed(NONE_KEY))
-  {
+  if (keypad_keypressed(NONE_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_NONE;
-    open_ui_mixing();
+    ui_open_mixing();
   }
 
-  if (keypad_keypressed(RESET_ALL_KEY))
-  {
+  if (keypad_keypressed(RESET_ALL_KEY)) {
     CURR_STATE = INITIAL_STATE;
-    open_ui_mixing();
+    ui_open_mixing();
   }
 
   if (keypad_keypressed(SCALEPLUS_KEY)) {
     if (CURR_STATE.fg_scale+1 < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
-      open_ui_mixing();
+      ui_open_mixing();
     }
   }
 
   if (keypad_keypressed(SCALEMINUS_KEY)) {
     if (CURR_STATE.fg_scale > 0) {
       CURR_STATE.fg_scale--;
-      open_ui_mixing();
+      ui_open_mixing();
     }
   }
 
   if (keypad_keypressed(NSTATE_KEY)) {
     current_mixing_state++;
     current_mixing_state %= NUM_MIXING_STATES;
-    open_ui_mixing();
+    ui_open_mixing();
   }
   if (keypad_keypressed(PSTATE_KEY)) {
     current_mixing_state += (NUM_MIXING_STATES-1);
     current_mixing_state %= NUM_MIXING_STATES;
-    open_ui_mixing();
+    ui_open_mixing();
   }
 }
 
@@ -186,20 +182,24 @@ void ui_open_options() {
   lcd_clear();
   lcd_print("      MENU      ");
   if (keypad_keypressed(KEY_LEFT)) {
-    open_ui_mixing();
+    ui_open_mixing();
   }
 }
 
 void ui_update_options() {
   if(keypad_keypressed(KEY_DOWN))
-    open_ui_mixing();
+    ui_open_mixing();
   if(keypad_keypressed(KEY_INDEX(0,0))) {
-    open_ui_mixing();
     flash_ddc_eeprom(DDC_EEPROM1);
+    lcd_clear();
+    lcd_print("Flashed EEPROM1!");
+    ui_open_transition(60, &ui_open_mixing);
   }
   if(keypad_keypressed(KEY_INDEX(1,0))) {
-    open_ui_mixing();
     flash_ddc_eeprom(DDC_EEPROM2);
+    lcd_clear();
+    lcd_print("Flashed EEPROM2!");
+    ui_open_transition(60, &ui_open_mixing);
   }
 }
 
@@ -209,10 +209,10 @@ void ui_update() {
     ui_update_transition();
     break;
   case UI_MIXING:
-    update_ui_mixing();
+    ui_update_mixing();
     break;
   case UI_OPTIONS:
-    update_ui_options();
+    ui_update_options();
     break;
   }
 }

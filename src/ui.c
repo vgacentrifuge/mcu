@@ -75,7 +75,7 @@ void ui_open_mixing() {
 
   lcd_set_cursor(0, 1);
   switch (CURR_STATE.fg_image_state) {
-    case FG_IS_LIVE:    lcd_print("L"); break;
+    case FG_IS_LIVE:    lcd_write(0); break;
     case FG_IS_FROZEN:  lcd_print("P"); break;
     case FG_IS_IMAGE:   lcd_print("I"); break;
   }

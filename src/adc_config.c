@@ -12,6 +12,7 @@
  * To support other resolutions:
  *  - The pixel clock PLL must know how many pixels there are per line.
  *  - The length of the HSYNC signal must be specified
+ *  - If sample rate every becomes > 70MSPS, register 0x03 should be changed
  *  - If sample rate ever becomes > 110MSPS, register 0x2C should be changed
  * See the #define values in this file
  ******************************************************************************/
@@ -25,6 +26,7 @@
 #include "sl_sleeptimer.h"
 #include "sl_udelay.h"
 #include <stdio.h>
+#include <stdint.h>
 #include "debug.h"
 
 #define I2C sl_i2cspm_i2c1
@@ -71,10 +73,12 @@ void write_register(uint8_t address, uint8_t reg, uint8_t value) {
 void configure_adc(uint8_t address) {
   // See ADC datasheet: https://www.ti.com/lit/ds/symlink/tvp7002.pdf
 
-  write_register(address, 0x01, PIXELS_PER_LINE>>4); // pixels per line [11:4]
-  write_register(address, 0x02, PIXELS_PER_LINE<<4); // pixels per line [3:0] into reg[7:4]
-  write_register(address, 0x03, 0x58); // Sets pixel clock range and charge pump current setting
-  write_register(address, 0x04, 0); // PLL phase select and PLL divider, we do 0 degrees
+  write_register(address, 0x01, (PIXELS_PER_LINE>>4)&0xFF); // pixels per line [11:4]
+  write_register(address, 0x02, (PIXELS_PER_LINE<<4)&0xFF); // pixels per line [3:0] into reg[7:4]
+
+  // Should be changed if PCLK > 70MHz
+  write_register(address, 0x03, 0b01101000); // Sets pixel clock range and charge pump current setting
+  write_register(address, 0x04, 0x10); // PLL phase select and PLL divider, we do 180 degrees
 
   // Clamp settings taken from table 13, assuming "PC graphics"
   write_register(address, 0x05, 0x06); // clamp start
@@ -114,7 +118,7 @@ void configure_adc(uint8_t address) {
 
   // 0x0F is H-PLL and Clamp Control, super complicated, I have no idea what it does
   // I don't think we need any clamping, so we change the defaults of 0x2A
-  write_register(address, 0x2A, 0b00000100); // Fine Clamp Control. Disable it for R,G,B
+  //write_register(address, 0x2A, 0b00000100); // Fine Clamp Control. Disable it for R,G,B
   write_register(address, 0x2D, 0x00); // Course Clamp Control. All disabled (which is also default)
   write_register(address, 0x10, 0x58); // Set all colors to bottom-level fine clamp (not sure if matters)
 

@@ -10,47 +10,49 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "lcd.h"
-
-#define CHOICE_SCREEN_WIDTH (LCD_COLUMNS-2)
-
-// TODO add more state initial values
-#define _STATE_INIT(_state) do {\
-  _state.fg_scale = 100;        \
-  _state.mode = NONE;           \
-  _state.fg_x_offset = 100;     \
-  _state.fg_y_offset = -100;    \
-} while(0)
-
-enum mode {
-  CHROMA,
-  OVERLAY,
-  NONE,
-};
-
 typedef struct {
-  char key[CHOICE_SCREEN_WIDTH];
-  int val;
-} choice_t;
-
-struct State {
-  uint16_t width;
-  uint16_t height;
-
   int16_t
-      fg_x_offset,
-      fg_y_offset;
-
-  uint8_t index;
+    fg_x_offset,
+    fg_y_offset;
 
   uint8_t fg_scale;
   uint8_t fg_blend_mode;
   uint8_t mode_flag;
   uint8_t fg_frozen;
   uint8_t fg_transparancy;
+} State;
 
-  enum mode mode;
+enum fg_scale {
+  FG_SCALE_100 = 0,
+  FG_SCALE_50 = 1,
+  FG_SCALE_25 = 2,
+  FG_SCALE_MAX = 2
 };
 
-// global state
-extern struct State state;
+enum fg_blend_mode {
+  FG_BLEND_NONE = 0,
+  FG_BLEND_NORMAL = 1,
+  FG_BLEND_CHROMA = 2,
+};
+
+enum fg_frozen {
+  FG_NOT_FROZEN = 0,
+  FG_FROZEN = 1
+};
+
+enum fg_transparancy {
+  FG_TRANSPARANCY_0 = 0,
+  FG_TRANSPARANCY_25 = 1,
+  FG_TRANSPARANCY_50 = 2,
+  FG_TRANSPARANCY_MAX = 2
+};
+
+#define INITIAL_STATE (State){\
+  .fg_x_offset = 0,           \
+  .fg_y_offset = 0,           \
+  .fg_scale = FG_SCALE_100,   \
+  .fg_blend_mode = FG_BLEND_NORMAL, \
+  .mode_flag = 0,             \
+  .fg_frozen = FG_NOT_FROZEN, \
+  .fg_transparancy = FG_TRANSPARANCY_0, \
+}

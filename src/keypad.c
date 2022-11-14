@@ -95,8 +95,12 @@ void keypad_sample() {
   }
 }
 
-bool keypad_keydown(int key) {
-  return key_down_time[key] >= MIN_HOLD_TIME;
+bool keypad_keydown(int key, int* was_down_frames) {
+  bool down = key_down_time[key] >= MIN_HOLD_TIME;
+  if (down && was_down_frames) {
+    *was_down_frames = key_down_time[key] - MIN_HOLD_TIME + 1;
+  }
+  return down;
 }
 
 bool keypad_keypressed(int key) {

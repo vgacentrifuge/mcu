@@ -97,9 +97,8 @@ void keypad_sample() {
 
 bool keypad_keydown(int key, int* was_down_frames) {
   bool down = key_down_time[key] >= MIN_HOLD_TIME;
-  if (down && was_down_frames) {
+  if (down && was_down_frames)
     *was_down_frames = key_down_time[key] - MIN_HOLD_TIME + 1;
-  }
   return down;
 }
 
@@ -109,8 +108,7 @@ bool keypad_keypressed(int key) {
 
 bool keypad_keyreleased(int key, int* was_down_frames) {
   bool released = key_down_time[key] <= -MIN_HOLD_TIME;
-  if (released && was_down_frames) {
+  if (released && was_down_frames)
     *was_down_frames = -key_down_time[key] - MIN_HOLD_TIME + 1;
-  }
   return released;
 }

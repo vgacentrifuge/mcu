@@ -20,8 +20,25 @@ const char* keySymbols[KEYPAD_ROWS * KEYPAD_COLS] = {
 [KEY_UP] = "^",
 [KEY_LEFT] = "<",
 [KEY_RIGHT] = ">",
-[KEY_DOWN] = "V"
+[KEY_DOWN] = "V",
+
+[PSTATE_KEY] = "Ps",
+[NSTATE_KEY] = "Ns",
+
+[TRANSPLUS_KEY] = "+T",
+[TRANSMINUS_KEY] = "-T",
+[SCALEUP_KEY] = "+S",
+[SCALEDOWN_KEY] = "-S",
+
+[CHROMA_KEY] = "CHR\nOMA",
+[OVERLAY_KEY] = "OVR\nLAY",
+[NONE_KEY] = "NON",
+
+[RESET_ALL_KEY] = "Rst",
+[RESET_OFFSET_KEY] = ">:<",
+[MENU_KEY] = "MNU"
 };
+#define KEY_TEXT_SIZE 40
 
 const int keyboardAlternatives[KEYPAD_ROWS * KEYPAD_COLS] = {
 [KEY_UP] = RAYLIB_KEY_UP,
@@ -64,7 +81,10 @@ void keypad_sample() {
 }
 
 bool keypad_keydown(int key, int* was_down_frames) {
-    return key_down_time[key]>=1;
+    bool down = key_down_time[key]>=1;
+    if (down && was_down_frames)
+        *was_down_frames = key_down_time[key];
+    return down;
 }
 
 bool keypad_keypressed(int key) {
@@ -86,7 +106,7 @@ void keypad_draw() {
             Color color = keypad_keydown(index, NULL) ? BLACK : LIGHTGRAY;
             DrawRectangle(x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_WIDTH, KEY_HEIGHT, color);
             if(keySymbols[index])
-                DrawText(keySymbols[index], x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_HEIGHT, GRAY);
+                DrawText(keySymbols[index], x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_TEXT_SIZE, GRAY);
         }
     }
     EndMode2D();

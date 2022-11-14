@@ -66,28 +66,37 @@ void ui_open_mixing() {
   lcd_clear();
   lcd_set_cursor(0, 0);
   switch (CURR_STATE.fg_blend_mode) {
-    case FG_BLEND_CHROMA:  lcd_print("CHROMA"); break;
-    case FG_BLEND_NORMAL:  lcd_print("OVRLAY"); break;
     case FG_BLEND_NONE:    lcd_print("NONE  "); break;
+    case FG_BLEND_OVERLAY:  lcd_print("OVRLAY"); break;
+    case FG_BLEND_CHROMA:  lcd_print("CHROMA"); break;
   }
 
   char buff[16];
 
   lcd_set_cursor(0, 1);
-  //TODO use custom chat
-  snprintf(buff, sizeof(buff), "%d", CURR_STATE.fg_frozen);
-  lcd_print(buff);
+  switch (CURR_STATE.fg_image_state) {
+    case FG_IS_LIVE:    lcd_print("L"); break;
+    case FG_IS_FROZEN:  lcd_print("P"); break;
+    case FG_IS_IMAGE:   lcd_print("I"); break;
+  }
+
+  lcd_set_cursor(6, 0);
+  switch (CURR_STATE.fg_transparency) {
+    case FG_TRANSPARENCY_0:    lcd_print(";"); break;
+    case FG_TRANSPARENCY_25:   lcd_print(":"); break;
+    case FG_TRANSPARENCY_50:   lcd_print(","); break;
+    case FG_TRANSPARENCY_75:   lcd_print("."); break;
+  }
 
   lcd_set_cursor(8, 0);
-  // TODO use custom char
-  snprintf(buff, sizeof(buff), "%d", CURR_STATE.fg_transparancy);
+  snprintf(buff, sizeof(buff), "%d", current_mixing_state);
   lcd_print(buff);
 
   lcd_set_cursor(10, 0);
-  snprintf(buff, sizeof(buff), "X%5d", CURR_STATE.fg_x_offset);
+  snprintf(buff, sizeof(buff), "X%+05d", CURR_STATE.fg_x_offset);
   lcd_print(buff);
   lcd_set_cursor(10, 1);
-  snprintf(buff, sizeof(buff), "Y%5d", CURR_STATE.fg_y_offset);
+  snprintf(buff, sizeof(buff), "Y%+05d", CURR_STATE.fg_y_offset);
   lcd_print(buff);
 
   lcd_set_cursor(3, 1);
@@ -112,25 +121,30 @@ void ui_update_mixing() {
   }
   if (keypad_keypressed(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
-       CURR_STATE.fg_y_offset++;
+      CURR_STATE.fg_y_offset++;
     }
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_LEFT)) {
     if (CURR_STATE.fg_y_offset > MIN_X_VAL) {
-       CURR_STATE.fg_x_offset--;
+      CURR_STATE.fg_x_offset--;
     }
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_RIGHT)) {
     if (CURR_STATE.fg_y_offset < MAX_X_VAL) {
-       CURR_STATE.fg_x_offset++;
+      CURR_STATE.fg_x_offset++;
     }
+    ui_open_mixing();
+  }
+  if (keypad_keypressed(RESET_OFFSET_KEY)) {
+    CURR_STATE.fg_x_offset = 0;
+    CURR_STATE.fg_y_offset = 0;
     ui_open_mixing();
   }
 
   if (keypad_keypressed(MENU_KEY)) {
-     ui_open_options();
+    ui_open_options();
   }
 
   if (keypad_keypressed(CHROMA_KEY)) {
@@ -138,7 +152,7 @@ void ui_update_mixing() {
     ui_open_mixing();
   }
   if (keypad_keypressed(OVERLAY_KEY)) {
-    CURR_STATE.fg_blend_mode = FG_BLEND_NORMAL;
+    CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
     ui_open_mixing();
   }
   if (keypad_keypressed(NONE_KEY)) {
@@ -151,14 +165,26 @@ void ui_update_mixing() {
     ui_open_mixing();
   }
 
-  if (keypad_keypressed(SCALEPLUS_KEY)) {
-    if (CURR_STATE.fg_scale+1 < FG_SCALE_MAX) {
+  if (keypad_keypressed(TRANSMINUS_KEY)) {
+      if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
+        CURR_STATE.fg_transparency++;
+        ui_open_mixing();
+      }
+    }
+    if (keypad_keypressed(TRANSPLUS_KEY)) {
+      if (CURR_STATE.fg_transparency > 0) {
+        CURR_STATE.fg_transparency--;
+        ui_open_mixing();
+      }
+    }
+
+  if (keypad_keypressed(SCALEDOWN_KEY)) {
+    if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
       ui_open_mixing();
     }
   }
-
-  if (keypad_keypressed(SCALEMINUS_KEY)) {
+  if (keypad_keypressed(SCALEUP_KEY)) {
     if (CURR_STATE.fg_scale > 0) {
       CURR_STATE.fg_scale--;
       ui_open_mixing();

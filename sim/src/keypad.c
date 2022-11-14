@@ -63,7 +63,7 @@ void keypad_sample() {
     }
 }
 
-bool keypad_keydown(int key) {
+bool keypad_keydown(int key, int* was_down_frames) {
     return key_down_time[key]>=1;
 }
 
@@ -83,7 +83,7 @@ void keypad_draw() {
     for(int y = 0; y < KEYPAD_COLS; y++) {
         for(int x = 0; x < KEYPAD_ROWS; x++) {
             int index = KEY_INDEX(x, y);
-            Color color = keypad_keydown(index) ? BLACK : LIGHTGRAY;
+            Color color = keypad_keydown(index, NULL) ? BLACK : LIGHTGRAY;
             DrawRectangle(x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_WIDTH, KEY_HEIGHT, color);
             if(keySymbols[index])
                 DrawText(keySymbols[index], x*KEY_STRIDE_X, y*KEY_STRIDE_Y, KEY_HEIGHT, GRAY);

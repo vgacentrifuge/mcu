@@ -10,13 +10,25 @@ static uint8_t line, col;
 
 void lcd_init() {}
 
+void interal_write(uint8_t value) {
+    data[line][col++] = value;
+}
+
 void lcd_print(char* str) {
     for(;*str != '\0'; str++) {
         if(line >= 0 && line < LINES && col >= 0 && col < COLS)
-            data[line][col++] = *str;
+            interal_write(*str);
         else
             fprintf(stderr, "LCD overflow: %c\n", *str);
     }
+}
+
+void lcd_custom_symbol(uint8_t location, uint8_t charmap[]) {
+
+}
+
+void lcd_write(uint8_t value) {
+    interal_write(value);
 }
 
 void lcd_clear() {
@@ -54,8 +66,3 @@ void lcd_draw() {
     }
     EndMode2D();
 }
-
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows) {
-}
-
-void lcd_write(uint8_t data) {}

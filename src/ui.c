@@ -20,6 +20,7 @@ static int ui_state;
 static State mixing_states[NUM_MIXING_STATES];
 static int current_mixing_state;
 #define CURR_STATE mixing_states[current_mixing_state]
+#define HEART_ID 0
 
 // TODO example - replace with real symbols
 unsigned char heart[8]  = {
@@ -35,7 +36,7 @@ unsigned char heart[8]  = {
 
 void ui_init(void)
 {
-  lcd_custom_symbol(0, heart);
+  lcd_custom_symbol(HEART_ID, heart); // TODO check if this works on actual LCD
 
   for (uint8_t i = 0; i < NUM_MIXING_STATES; i++)
     mixing_states[i] = INITIAL_STATE;
@@ -63,6 +64,7 @@ void ui_update_transition() {
 void ui_open_mixing() {
   ui_state = UI_MIXING;
 
+  // Prints overlay mode
   lcd_clear();
   lcd_set_cursor(0, 0);
   switch (CURR_STATE.fg_blend_mode) {
@@ -73,28 +75,43 @@ void ui_open_mixing() {
 
   char buff[16];
 
+  // Prints frozen / playing state
+  lcd_set_cursor(7, 0);
+  switch (CURR_STATE.fg_frozen) {
+    case FG_NOT_FROZEN: lcd_print("|>"); break;
+    case FG_FROZEN:     lcd_print("||"); break;
+  }
+
+  // Prints transparency level with custome character (TODO)
   lcd_set_cursor(0, 1);
-  //TODO use custom chat
-  snprintf(buff, sizeof(buff), "%d", CURR_STATE.fg_frozen);
+  switch (CURR_STATE.fg_transparancy)
+  {
+    case FG_TRANSPARANCY_0:   lcd_print("T 0%"); break;
+    case FG_TRANSPARANCY_25:  lcd_print("T25%"); break;
+    case FG_TRANSPARANCY_50:  lcd_print("T50%"); break;
+  }
+  // Prints index of our current state
+  lcd_set_cursor(9, 0);
+  snprintf(buff, sizeof(buff), "%d", current_mixing_state);
   lcd_print(buff);
 
-  lcd_set_cursor(8, 0);
-  // TODO use custom char
-  snprintf(buff, sizeof(buff), "%d", CURR_STATE.fg_transparancy);
+  // Prints x offset
+  lcd_set_cursor(11, 0);
+  snprintf(buff, sizeof(buff), "X%4d", CURR_STATE.fg_x_offset);
   lcd_print(buff);
 
-  lcd_set_cursor(10, 0);
-  snprintf(buff, sizeof(buff), "X%5d", CURR_STATE.fg_x_offset);
-  lcd_print(buff);
-  lcd_set_cursor(10, 1);
-  snprintf(buff, sizeof(buff), "Y%5d", CURR_STATE.fg_y_offset);
+  // Prints y offset
+  lcd_set_cursor(11, 1);
+  snprintf(buff, sizeof(buff), "Y%4d", CURR_STATE.fg_y_offset);
   lcd_print(buff);
 
-  lcd_set_cursor(3, 1);
-  switch (CURR_STATE.fg_scale) {
-    case FG_SCALE_100:  lcd_print("SC100%"); break;
-    case FG_SCALE_50:   lcd_print("SC 50%"); break;
-    case FG_SCALE_25:   lcd_print("SC 25%"); break;
+  // Prints Scale value
+  lcd_set_cursor(5, 1);
+  switch (CURR_STATE.fg_scale) 
+  {
+    case FG_SCALE_100:  lcd_print("S100%"); break;
+    case FG_SCALE_50:   lcd_print("S 50%"); break;
+    case FG_SCALE_25:   lcd_print("S 25%"); break;
   }
 }
 
@@ -152,7 +169,7 @@ void ui_update_mixing() {
   }
 
   if (keypad_keypressed(SCALEPLUS_KEY)) {
-    if (CURR_STATE.fg_scale+1 < FG_SCALE_MAX) {
+    if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
       ui_open_mixing();
     }
@@ -173,6 +190,25 @@ void ui_update_mixing() {
   if (keypad_keypressed(PSTATE_KEY)) {
     current_mixing_state += (NUM_MIXING_STATES-1);
     current_mixing_state %= NUM_MIXING_STATES;
+    ui_open_mixing();
+  }
+
+  if (keypad_keypressed(TRANSPLUS_KEY)) {
+    if (CURR_STATE.fg_transparancy < FG_TRANSPARANCY_MAX) {
+      CURR_STATE.fg_transparancy++;
+    }
+    ui_open_mixing();
+  }
+
+  if (keypad_keypressed(TRANSMINUS_KEY)) {
+    if (CURR_STATE.fg_transparancy > 0) {
+      CURR_STATE.fg_transparancy--;
+    }
+    ui_open_mixing();
+  }
+
+  if (keypad_keypressed(PLAY_KEY)) {
+    CURR_STATE.fg_frozen = CURR_STATE.fg_frozen ? FG_NOT_FROZEN : FG_FROZEN;
     ui_open_mixing();
   }
 }

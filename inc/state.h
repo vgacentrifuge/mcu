@@ -37,7 +37,7 @@ enum fg_blend_mode {
 
 enum fg_frozen {
   FG_NOT_FROZEN = 0,
-  FG_FROZEN = 1
+  FG_FROZEN = 1,
 };
 
 enum fg_transparancy {

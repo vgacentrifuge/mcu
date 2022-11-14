@@ -48,6 +48,6 @@ void lcd_set_cursor(uint8_t col, uint8_t line) {
 /**
  * Creates custom symbol
  */
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows) {
+void lcd_custom_symbol(uint8_t char_num, uint8_t rows[]) {
   DFR_custom_symbol(char_num, rows);
 }

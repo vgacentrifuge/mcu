@@ -22,8 +22,8 @@
 #define PSTATE_KEY  KEY_INDEX(0,0)
 #define NSTATE_KEY  KEY_INDEX(1,0)
 
-#define TRANSPLUS_KEY  KEY_INDEX(0,2)
-#define TRANSMINUS_KEY KEY_INDEX(1,2)
+#define TRANSPLUS_KEY  KEY_INDEX(2,0)
+#define TRANSMINUS_KEY KEY_INDEX(2,1)
 
 #define SCALEPLUS_KEY  KEY_INDEX(3,0)
 #define SCALEMINUS_KEY KEY_INDEX(3,1)
@@ -34,6 +34,8 @@
 
 #define RESET_ALL_KEY KEY_INDEX(1,1)
 #define MENU_KEY      KEY_INDEX(3,2)
+
+#define PLAY_KEY    KEY_INDEX(1,2)
 
 void keypad_init();
 

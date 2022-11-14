@@ -22,4 +22,4 @@ void lcd_home();
 
 void lcd_set_cursor(uint8_t col, uint8_t line);
 
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows);
+void lcd_custom_symbol(uint8_t char_num, uint8_t rows[]);

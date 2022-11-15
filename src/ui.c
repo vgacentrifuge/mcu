@@ -113,22 +113,6 @@ void ui_open_mixing() {
 #define MAX_Y_VAL  600
 #define MIN_Y_VAL -600
 
-static void send_all_state() {
-  fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
-  // TODO: Implement on FPGA?
-  // fpga_spi_sendcmd1(CMD_FG_MODE_FLAGS, 0);
-  fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
-  fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
-  fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
-  fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
-  fpga_spi_sendcmd_i16(CMD_FG_CLIP_LEFT, CURR_STATE.fg_clipping_left);
-  fpga_spi_sendcmd_i16(CMD_FG_CLIP_RIGHT, CURR_STATE.fg_clipping_right);
-  fpga_spi_sendcmd_i16(CMD_FG_CLIP_TOP, CURR_STATE.fg_clipping_top);
-  fpga_spi_sendcmd_i16(CMD_FG_CLIP_BOTTOM, CURR_STATE.fg_clipping_bottom);
-  // TODO: Implement in menu
-  // fpga_spi_sendcmd1(CMD_FG_FREEZE, 0);
-}
-
 void ui_update_mixing() {
   if (keypad_keypressed(KEY_DOWN)) {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
@@ -226,13 +210,13 @@ void ui_update_mixing() {
   if (keypad_keypressed(NSTATE_KEY)) {
     current_mixing_state++;
     current_mixing_state %= NUM_MIXING_STATES;
-    send_all_state();
+    fpga_spi_send_state(CURR_STATE);
     ui_open_mixing();
   }
   if (keypad_keypressed(PSTATE_KEY)) {
     current_mixing_state += (NUM_MIXING_STATES-1);
     current_mixing_state %= NUM_MIXING_STATES;
-    send_all_state();
+    fpga_spi_send_state(CURR_STATE);
     ui_open_mixing();
   }
 }

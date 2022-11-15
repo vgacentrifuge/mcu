@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "state.h"
 
 typedef enum {
   CMD_RESET = 0x0,
@@ -19,6 +20,8 @@ typedef enum {
 } cmd_type_t;
 
 void fpga_spi_init();
+
+void fpga_spi_send_state(State state);
 
 void fpga_spi_sendcmd(cmd_type_t cmd);
 

@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "ddc_data.h"
 #include "state.h"
+#include "fpga_spi.h"
 #include <stdio.h>
 
 enum {
@@ -112,35 +113,57 @@ void ui_open_mixing() {
 #define MAX_Y_VAL  600
 #define MIN_Y_VAL -600
 
+static void send_all_state() {
+  fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
+  // TODO: Implement on FPGA?
+  // fpga_spi_sendcmd1(CMD_FG_MODE_FLAGS, 0);
+  fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
+  fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
+  fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
+  fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
+  fpga_spi_sendcmd_i16(CMD_FG_CLIP_LEFT, CURR_STATE.fg_clipping_left);
+  fpga_spi_sendcmd_i16(CMD_FG_CLIP_RIGHT, CURR_STATE.fg_clipping_right);
+  fpga_spi_sendcmd_i16(CMD_FG_CLIP_TOP, CURR_STATE.fg_clipping_top);
+  fpga_spi_sendcmd_i16(CMD_FG_CLIP_BOTTOM, CURR_STATE.fg_clipping_bottom);
+  // TODO: Implement in menu
+  // fpga_spi_sendcmd1(CMD_FG_FREEZE, 0);
+}
+
 void ui_update_mixing() {
   if (keypad_keypressed(KEY_DOWN)) {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
       CURR_STATE.fg_y_offset--;
     }
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
       CURR_STATE.fg_y_offset++;
     }
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_LEFT)) {
-    if (CURR_STATE.fg_y_offset > MIN_X_VAL) {
+    if (CURR_STATE.fg_x_offset > MIN_X_VAL) {
       CURR_STATE.fg_x_offset--;
     }
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_RIGHT)) {
-    if (CURR_STATE.fg_y_offset < MAX_X_VAL) {
+    if (CURR_STATE.fg_x_offset < MAX_X_VAL) {
       CURR_STATE.fg_x_offset++;
     }
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(RESET_OFFSET_KEY)) {
     CURR_STATE.fg_x_offset = 0;
     CURR_STATE.fg_y_offset = 0;
     ui_open_mixing();
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
+    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
   }
 
   if (keypad_keypressed(MENU_KEY)) {
@@ -149,31 +172,38 @@ void ui_update_mixing() {
 
   if (keypad_keypressed(CHROMA_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
+    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
   if (keypad_keypressed(OVERLAY_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
+    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
   if (keypad_keypressed(NONE_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_NONE;
+    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
 
   if (keypad_keypressed(RESET_ALL_KEY)) {
     CURR_STATE = INITIAL_STATE;
+    // TODO: Might change to send_all_state() to ensure same state on FPGA
+    fpga_spi_sendcmd(CMD_RESET);
     ui_open_mixing();
   }
 
   if (keypad_keypressed(TRANSMINUS_KEY)) {
       if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
         CURR_STATE.fg_transparency++;
+        fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
         ui_open_mixing();
       }
     }
     if (keypad_keypressed(TRANSPLUS_KEY)) {
       if (CURR_STATE.fg_transparency > 0) {
         CURR_STATE.fg_transparency--;
+        fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
         ui_open_mixing();
       }
     }
@@ -181,12 +211,14 @@ void ui_update_mixing() {
   if (keypad_keypressed(SCALEDOWN_KEY)) {
     if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
+      fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
       ui_open_mixing();
     }
   }
   if (keypad_keypressed(SCALEUP_KEY)) {
     if (CURR_STATE.fg_scale > 0) {
       CURR_STATE.fg_scale--;
+      fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
       ui_open_mixing();
     }
   }
@@ -194,11 +226,13 @@ void ui_update_mixing() {
   if (keypad_keypressed(NSTATE_KEY)) {
     current_mixing_state++;
     current_mixing_state %= NUM_MIXING_STATES;
+    send_all_state();
     ui_open_mixing();
   }
   if (keypad_keypressed(PSTATE_KEY)) {
     current_mixing_state += (NUM_MIXING_STATES-1);
     current_mixing_state %= NUM_MIXING_STATES;
+    send_all_state();
     ui_open_mixing();
   }
 }

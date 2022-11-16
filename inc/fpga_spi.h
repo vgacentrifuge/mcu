@@ -23,6 +23,33 @@ void fpga_spi_init();
 
 void fpga_spi_send_state(State state);
 
+void fpga_spi_reset();
+
+void fpga_spi_fg_mode(uint8_t mode);
+
+void fpga_spi_fg_mode_flags(uint8_t flags);
+
+void fpga_spi_fg_scale(uint8_t scale);
+
+void fpga_spi_fg_offset_x(int16_t offset);
+
+void fpga_spi_fg_offset_y(int16_t offset);
+
+void fpga_spi_fg_transparency(uint8_t transparency);
+
+void fpga_spi_fg_clip_left(int16_t clip);
+
+void fpga_spi_fg_clip_right(int16_t clip);
+
+void fpga_spi_fg_clip_top(int16_t clip);
+
+void fpga_spi_fg_clip_bottom(int16_t clip);
+
+void fpga_spi_fg_freeze(uint8_t freeze);
+
+// TODO: Implement
+// void fpga_spi_img_upload();
+
 void fpga_spi_sendcmd(cmd_type_t cmd);
 
 void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg);

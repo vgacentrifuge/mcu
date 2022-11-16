@@ -118,36 +118,36 @@ void ui_update_mixing() {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
       CURR_STATE.fg_y_offset--;
     }
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
+    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
       CURR_STATE.fg_y_offset++;
     }
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
+    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_LEFT)) {
     if (CURR_STATE.fg_x_offset > MIN_X_VAL) {
       CURR_STATE.fg_x_offset--;
     }
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
+    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(KEY_RIGHT)) {
     if (CURR_STATE.fg_x_offset < MAX_X_VAL) {
       CURR_STATE.fg_x_offset++;
     }
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
+    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
     ui_open_mixing();
   }
   if (keypad_keypressed(RESET_OFFSET_KEY)) {
     CURR_STATE.fg_x_offset = 0;
     CURR_STATE.fg_y_offset = 0;
     ui_open_mixing();
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_X, CURR_STATE.fg_x_offset);
-    fpga_spi_sendcmd_i16(CMD_FG_OFFSET_Y, CURR_STATE.fg_y_offset);
+    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
+    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
   }
 
   if (keypad_keypressed(MENU_KEY)) {
@@ -156,38 +156,38 @@ void ui_update_mixing() {
 
   if (keypad_keypressed(CHROMA_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
-    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
+    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
   if (keypad_keypressed(OVERLAY_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
-    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
+    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
   if (keypad_keypressed(NONE_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_NONE;
-    fpga_spi_sendcmd_u8(CMD_FG_MODE, CURR_STATE.fg_blend_mode);
+    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
     ui_open_mixing();
   }
 
   if (keypad_keypressed(RESET_ALL_KEY)) {
     CURR_STATE = INITIAL_STATE;
     // TODO: Might change to send_all_state() to ensure same state on FPGA
-    fpga_spi_sendcmd(CMD_RESET);
+    fpga_spi_reset();
     ui_open_mixing();
   }
 
   if (keypad_keypressed(TRANSMINUS_KEY)) {
       if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
         CURR_STATE.fg_transparency++;
-        fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
+        fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
         ui_open_mixing();
       }
     }
     if (keypad_keypressed(TRANSPLUS_KEY)) {
       if (CURR_STATE.fg_transparency > 0) {
         CURR_STATE.fg_transparency--;
-        fpga_spi_sendcmd_u8(CMD_FG_TRANSPARENCY, CURR_STATE.fg_transparency);
+        fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
         ui_open_mixing();
       }
     }
@@ -195,14 +195,14 @@ void ui_update_mixing() {
   if (keypad_keypressed(SCALEDOWN_KEY)) {
     if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
-      fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
+      fpga_spi_fg_scale(CURR_STATE.fg_scale);
       ui_open_mixing();
     }
   }
   if (keypad_keypressed(SCALEUP_KEY)) {
     if (CURR_STATE.fg_scale > 0) {
       CURR_STATE.fg_scale--;
-      fpga_spi_sendcmd_u8(CMD_FG_SCALE, CURR_STATE.fg_scale);
+      fpga_spi_fg_scale(CURR_STATE.fg_scale);
       ui_open_mixing();
     }
   }

@@ -23,19 +23,10 @@ static int current_mixing_state;
 #define CURR_STATE mixing_states[current_mixing_state]
 
 // TODO example - replace with real symbols
-unsigned char heart[8]  = {
-    0b00000,
-    0b01010,
-    0b11111,
-    0b11111,
-    0b11111,
-    0b01110,
-    0b00100,
-    0b00000
-};
+unsigned char heart[8] = { 0b00000, 0b01010, 0b11111, 0b11111, 0b11111, 0b01110,
+    0b00100, 0b00000 };
 
-void ui_init(void)
-{
+void ui_init(void) {
   lcd_custom_symbol(0, heart);
 
   for (uint8_t i = 0; i < NUM_MIXING_STATES; i++)
@@ -57,7 +48,7 @@ void ui_open_transition(int frames, void (*callback)()) {
 }
 
 void ui_update_transition() {
-  if(ui_transition_frames_left-- <= 0)
+  if (ui_transition_frames_left-- <= 0)
     ui_transition_callback();
 }
 
@@ -67,26 +58,26 @@ void ui_open_mixing() {
   lcd_clear();
   lcd_set_cursor(0, 0);
   switch (CURR_STATE.fg_blend_mode) {
-    case FG_BLEND_NONE:    lcd_print("NONE  "); break;
-    case FG_BLEND_OVERLAY:  lcd_print("OVRLAY"); break;
-    case FG_BLEND_CHROMA:  lcd_print("CHROMA"); break;
+    case FG_BLEND_NONE: lcd_print("NONE  "); break;
+    case FG_BLEND_OVERLAY: lcd_print("OVRLAY"); break;
+    case FG_BLEND_CHROMA: lcd_print("CHROMA"); break;
   }
 
   char buff[16];
 
   lcd_set_cursor(0, 1);
   switch (CURR_STATE.fg_image_state) {
-    case FG_IS_LIVE:    lcd_write(0); break;
-    case FG_IS_FROZEN:  lcd_print("P"); break;
-    case FG_IS_IMAGE:   lcd_print("I"); break;
+    case FG_IS_LIVE: lcd_write(0); break;
+    case FG_IS_FROZEN: lcd_print("P"); break;
+    case FG_IS_IMAGE: lcd_print("I"); break;
   }
 
   lcd_set_cursor(6, 0);
   switch (CURR_STATE.fg_transparency) {
-    case FG_TRANSPARENCY_0:    lcd_print(";"); break;
-    case FG_TRANSPARENCY_25:   lcd_print(":"); break;
-    case FG_TRANSPARENCY_50:   lcd_print(","); break;
-    case FG_TRANSPARENCY_75:   lcd_print("."); break;
+    case FG_TRANSPARENCY_0: lcd_print(";"); break;
+    case FG_TRANSPARENCY_25: lcd_print(":"); break;
+    case FG_TRANSPARENCY_50: lcd_print(","); break;
+    case FG_TRANSPARENCY_75: lcd_print("."); break;
   }
 
   lcd_set_cursor(8, 0);
@@ -102,9 +93,9 @@ void ui_open_mixing() {
 
   lcd_set_cursor(3, 1);
   switch (CURR_STATE.fg_scale) {
-    case FG_SCALE_100:  lcd_print("SC100%"); break;
-    case FG_SCALE_50:   lcd_print("SC 50%"); break;
-    case FG_SCALE_25:   lcd_print("SC 25%"); break;
+    case FG_SCALE_100: lcd_print("SC100%"); break;
+    case FG_SCALE_50: lcd_print("SC 50%"); break;
+    case FG_SCALE_25: lcd_print("SC 25%"); break;
   }
 }
 
@@ -178,19 +169,19 @@ void ui_update_mixing() {
   }
 
   if (keypad_keypressed(TRANSMINUS_KEY)) {
-      if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
-        CURR_STATE.fg_transparency++;
-        fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
-        ui_open_mixing();
-      }
+    if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
+      CURR_STATE.fg_transparency++;
+      fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
+      ui_open_mixing();
     }
-    if (keypad_keypressed(TRANSPLUS_KEY)) {
-      if (CURR_STATE.fg_transparency > 0) {
-        CURR_STATE.fg_transparency--;
-        fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
-        ui_open_mixing();
-      }
+  }
+  if (keypad_keypressed(TRANSPLUS_KEY)) {
+    if (CURR_STATE.fg_transparency > 0) {
+      CURR_STATE.fg_transparency--;
+      fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
+      ui_open_mixing();
     }
+  }
 
   if (keypad_keypressed(SCALEDOWN_KEY)) {
     if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
@@ -231,15 +222,15 @@ void ui_open_options() {
 }
 
 void ui_update_options() {
-  if(keypad_keypressed(KEY_DOWN))
+  if (keypad_keypressed(KEY_DOWN))
     ui_open_mixing();
-  if(keypad_keypressed(KEY_INDEX(0,0))) {
+  if (keypad_keypressed(KEY_INDEX(0, 0))) {
     flash_ddc_eeprom(DDC_EEPROM1);
     lcd_clear();
     lcd_print("Flashed EEPROM1!");
     ui_open_transition(60, &ui_open_mixing);
   }
-  if(keypad_keypressed(KEY_INDEX(1,0))) {
+  if (keypad_keypressed(KEY_INDEX(1, 0))) {
     flash_ddc_eeprom(DDC_EEPROM2);
     lcd_clear();
     lcd_print("Flashed EEPROM2!");
@@ -248,7 +239,7 @@ void ui_update_options() {
 }
 
 void ui_update() {
-  switch(ui_state) {
+  switch (ui_state) {
   case UI_TRANSITION:
     ui_update_transition();
     break;

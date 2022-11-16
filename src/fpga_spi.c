@@ -18,7 +18,6 @@ void fpga_spi_send_state(State state) {
   fpga_spi_fg_clip_right(state.fg_clipping_right);
   fpga_spi_fg_clip_top(state.fg_clipping_top);
   fpga_spi_fg_clip_bottom(state.fg_clipping_bottom);
-  // TODO: Add to state
   fpga_spi_fg_freeze(state.fg_image_state);
 }
 

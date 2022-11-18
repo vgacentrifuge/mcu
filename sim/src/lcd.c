@@ -55,7 +55,11 @@ void lcd_draw() {
     EndMode2D();
 }
 
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows) {
+void lcd_custom_symbol(uint8_t char_num, uint8_t const* rows) {
+    (void) char_num;
+    (void) rows;
 }
 
-void lcd_write(uint8_t data) {}
+void lcd_write(uint8_t char_num) {
+    data[line][col++] = '0'+char_num;
+}

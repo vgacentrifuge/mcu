@@ -4,7 +4,6 @@
 #include "debug.h"
 #include "ddc_data.h"
 #include "state.h"
-#include "fpga_spi.h"
 #include <stdio.h>
 
 enum {
@@ -17,17 +16,24 @@ static int ui_state;
 
 static int ui_state;
 
-#define NUM_MIXING_STATES 10
-static State mixing_states[NUM_MIXING_STATES];
-static int current_mixing_state;
-#define CURR_STATE mixing_states[current_mixing_state]
+enum {
+  PLAY_SYMBOL_INDEX = 0,
+  PAUSE_SYMBOL_INDEX = 1,
+  IMG_SYMBOL_INDEX = 2,
 
-// TODO example - replace with real symbols
-unsigned char heart[8] = { 0b00000, 0b01010, 0b11111, 0b11111, 0b11111, 0b01110,
-    0b00100, 0b00000 };
+  TRANS100_SYMBOL_INDEX = 3,
+  TRANS75_SYMBOL_INDEX = 4,
+  TRANS50_SYMBOL_INDEX = 5,
+  TRANS25_SYMBOL_INDEX = 6,
+};
+const uint8_t PLAY_SYMBOL[8]  = { 0b10000, 0b11000, 0b11100, 0b11110, 0b11110, 0b11100, 0b11000, 0b10000 };
+const uint8_t PAUSE_SYMBOL[8] = { 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011 };
+const uint8_t IMG_SYMBOL[8]   = { 0b00000, 0b11111, 0b11001, 0b10001, 0b10111, 0b11111, 0b11111, 0b11111 };
 
 void ui_init(void) {
-  lcd_custom_symbol(0, heart);
+  lcd_custom_symbol(PLAY_SYMBOL_INDEX, PLAY_SYMBOL);
+  lcd_custom_symbol(PAUSE_SYMBOL_INDEX, PAUSE_SYMBOL);
+  lcd_custom_symbol(IMG_SYMBOL_INDEX, IMG_SYMBOL);
 
   for (uint8_t i = 0; i < NUM_MIXING_STATES; i++)
     mixing_states[i] = INITIAL_STATE;
@@ -67,9 +73,9 @@ void ui_open_mixing() {
 
   lcd_set_cursor(0, 1);
   switch (CURR_STATE.fg_image_state) {
-    case FG_IS_LIVE: lcd_write(0); break;
-    case FG_IS_FROZEN: lcd_print("P"); break;
-    case FG_IS_IMAGE: lcd_print("I"); break;
+    case FG_IS_LIVE:   lcd_write(PLAY_SYMBOL_INDEX); break;
+    case FG_IS_FROZEN: lcd_write(PAUSE_SYMBOL_INDEX); break;
+    case FG_IS_IMAGE:  lcd_write(IMG_SYMBOL_INDEX); break;
   }
 
   lcd_set_cursor(6, 0);
@@ -105,109 +111,99 @@ void ui_open_mixing() {
 #define MIN_Y_VAL -600
 
 void ui_update_mixing() {
+  bool dirty = false;
   if (keypad_keypressed(KEY_DOWN)) {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
       CURR_STATE.fg_y_offset--;
+      dirty = true;
     }
-    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
-    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
       CURR_STATE.fg_y_offset++;
+      dirty = true;
     }
-    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
-    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_LEFT)) {
     if (CURR_STATE.fg_x_offset > MIN_X_VAL) {
       CURR_STATE.fg_x_offset--;
+      dirty = true;
     }
-    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
-    ui_open_mixing();
   }
   if (keypad_keypressed(KEY_RIGHT)) {
     if (CURR_STATE.fg_x_offset < MAX_X_VAL) {
       CURR_STATE.fg_x_offset++;
+      dirty = true;
     }
-    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
-    ui_open_mixing();
   }
-  if (keypad_keypressed(RESET_OFFSET_KEY)) {
+  if (keypad_keypressed(KEY_RESET_OFFSET)) {
     CURR_STATE.fg_x_offset = 0;
     CURR_STATE.fg_y_offset = 0;
-    ui_open_mixing();
-    fpga_spi_fg_offset_x(CURR_STATE.fg_x_offset);
-    fpga_spi_fg_offset_y(CURR_STATE.fg_y_offset);
+    dirty = true;
   }
 
-  if (keypad_keypressed(MENU_KEY)) {
+  if (keypad_keypressed(KEY_MENU)) {
     ui_open_options();
   }
 
-  if (keypad_keypressed(CHROMA_KEY)) {
+  if (keypad_keypressed(KEY_CHROMA_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
-    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
-    ui_open_mixing();
+    dirty = true;
   }
-  if (keypad_keypressed(OVERLAY_KEY)) {
+  if (keypad_keypressed(KEY_OVERLAY_KEY)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
-    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
-    ui_open_mixing();
+    dirty = true;
   }
-  if (keypad_keypressed(NONE_KEY)) {
+  if (keypad_keypressed(KEY_NONE)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_NONE;
-    fpga_spi_fg_mode(CURR_STATE.fg_blend_mode);
-    ui_open_mixing();
+    dirty = true;
   }
 
-  if (keypad_keypressed(RESET_ALL_KEY)) {
+  if (keypad_keypressed(KEY_RESET_ALL)) {
+    state_send_reset();
     CURR_STATE = INITIAL_STATE;
-    // TODO: Might change to send_all_state() to ensure same state on FPGA
-    fpga_spi_reset();
-    ui_open_mixing();
+    dirty = true;
   }
 
-  if (keypad_keypressed(TRANSMINUS_KEY)) {
+  if (keypad_keypressed(KEY_TRANSMINUS)) {
     if (CURR_STATE.fg_transparency < FG_TRANSPARENCY_MAX) {
       CURR_STATE.fg_transparency++;
-      fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
-      ui_open_mixing();
+      dirty = true;
     }
   }
-  if (keypad_keypressed(TRANSPLUS_KEY)) {
+  if (keypad_keypressed(KEY_TRANSPLUS)) {
     if (CURR_STATE.fg_transparency > 0) {
       CURR_STATE.fg_transparency--;
-      fpga_spi_fg_transparency(CURR_STATE.fg_transparency);
-      ui_open_mixing();
+      dirty = true;
     }
   }
 
-  if (keypad_keypressed(SCALEDOWN_KEY)) {
+  if (keypad_keypressed(KEY_SCALEDOWN)) {
     if (CURR_STATE.fg_scale < FG_SCALE_MAX) {
       CURR_STATE.fg_scale++;
-      fpga_spi_fg_scale(CURR_STATE.fg_scale);
-      ui_open_mixing();
+      dirty = true;
     }
   }
-  if (keypad_keypressed(SCALEUP_KEY)) {
+  if (keypad_keypressed(KEY_SCALEUP)) {
     if (CURR_STATE.fg_scale > 0) {
       CURR_STATE.fg_scale--;
-      fpga_spi_fg_scale(CURR_STATE.fg_scale);
-      ui_open_mixing();
+      dirty = true;
     }
   }
 
-  if (keypad_keypressed(NSTATE_KEY)) {
+  if (keypad_keypressed(KEY_NSTATE)) {
     current_mixing_state++;
     current_mixing_state %= NUM_MIXING_STATES;
-    fpga_spi_send_state(CURR_STATE);
-    ui_open_mixing();
+    dirty = true;
   }
-  if (keypad_keypressed(PSTATE_KEY)) {
+  if (keypad_keypressed(KEY_PSTATE)) {
     current_mixing_state += (NUM_MIXING_STATES-1);
     current_mixing_state %= NUM_MIXING_STATES;
-    fpga_spi_send_state(CURR_STATE);
+    dirty = true;
+  }
+
+  if (dirty) {
+    state_send_changes();
     ui_open_mixing();
   }
 }
@@ -216,14 +212,12 @@ void ui_open_options() {
   ui_state = UI_OPTIONS;
   lcd_clear();
   lcd_print("      MENU      ");
-  if (keypad_keypressed(KEY_LEFT)) {
-    ui_open_mixing();
-  }
 }
 
 void ui_update_options() {
-  if (keypad_keypressed(KEY_DOWN))
+  if (keypad_keypressed(KEY_MENU))
     ui_open_mixing();
+
   if (keypad_keypressed(KEY_INDEX(0, 0))) {
     flash_ddc_eeprom(DDC_EEPROM1);
     lcd_clear();

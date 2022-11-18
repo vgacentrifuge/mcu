@@ -20,8 +20,8 @@ void lcd_clear() {
 /**
  * Writes to lcd, also allows writing the 0 byte
  */
-void lcd_write(uint8_t data) {
-  DFR_write(data);
+void lcd_write(uint8_t char_num) {
+  DFR_write(char_num);
 }
 
 /**
@@ -42,6 +42,6 @@ void lcd_set_cursor(uint8_t col, uint8_t line) {
 /**
  * Creates custom symbol, the ASCII values 0-7 can be customized
  */
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows) {
+void lcd_custom_symbol(uint8_t char_num, uint8_t const* rows) {
   DFR_customSymbol(char_num, rows);
 }

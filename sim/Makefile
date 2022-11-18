@@ -7,7 +7,7 @@ LDFLAGS:=$(LDFLAGS) -Wall -Wextra -O2 -Lraylib -g
 BUILD_DIR:=build
 
 # These are the files from the actual codebase that get included in our sim
-SRC_FILES:=../src/app.c ../src/debug.c ../src/ui.c
+SRC_FILES:=../src/app.c ../src/debug.c ../src/ui.c ../src/state.c
 # Files belonging to the sim
 SIM_FILES:=$(wildcard src/*.c)
 

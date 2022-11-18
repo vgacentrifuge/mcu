@@ -16,10 +16,10 @@ void lcd_print(char* str);
 
 void lcd_clear();
 
-void lcd_write(uint8_t);
+void lcd_write(uint8_t char_num);
 
 void lcd_home();
 
 void lcd_set_cursor(uint8_t col, uint8_t line);
 
-void lcd_custom_symbol(uint8_t char_num, uint8_t* rows);
+void lcd_custom_symbol(uint8_t char_num, uint8_t const* rows);

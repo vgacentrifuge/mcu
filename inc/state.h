@@ -12,7 +12,7 @@
 
 typedef struct {
   uint8_t fg_blend_mode;
-  uint8_t mode_flag;
+  uint8_t fg_mode_flag;
   uint8_t fg_scale;
   int16_t fg_x_offset;
   int16_t fg_y_offset;
@@ -59,7 +59,7 @@ enum fg_image_mode {
 
 #define INITIAL_STATE (State){        \
     .fg_blend_mode = FG_BLEND_NONE,   \
-    .mode_flag = 0,                   \
+    .fg_mode_flag = 0,                   \
     .fg_scale = FG_SCALE_100,         \
     .fg_x_offset = 0,                 \
     .fg_y_offset = 0,                 \
@@ -70,3 +70,11 @@ enum fg_image_mode {
     .fg_clipping_bottom = 0,          \
     .fg_image_state = FG_IS_LIVE \
 }
+
+#define NUM_MIXING_STATES 10
+extern State mixing_states[NUM_MIXING_STATES];
+extern int current_mixing_state;
+#define CURR_STATE mixing_states[current_mixing_state]
+
+void state_send_changes();
+void state_send_reset();

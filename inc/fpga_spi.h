@@ -26,6 +26,6 @@ void fpga_spi_sendcmd(cmd_type_t cmd);
 
 void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg);
 
-void fpga_spi_sendcmd_u16(cmd_type_t cmd, int16_t arg);
+void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg);
 
 void fpga_spi_receive(uint8_t *buffer, uint8_t len);

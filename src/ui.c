@@ -110,27 +110,35 @@ void ui_open_mixing() {
 #define MAX_Y_VAL  600
 #define MIN_Y_VAL -600
 
+#define REPEAT_DELAY 15
+#define REPEAT_PERIOD 5
+#define KEY_DOWN_OR_REPEAT(KEY) \
+    (keypad_keydown(KEY, &was_down_frames) \
+    && ((was_down_frames > REPEAT_DELAY && (was_down_frames - REPEAT_DELAY) % REPEAT_PERIOD == 0) \
+    || was_down_frames == 1))
+
 void ui_update_mixing() {
   bool dirty = false;
-  if (keypad_keypressed(KEY_DOWN)) {
+  int was_down_frames;
+  if (KEY_DOWN_OR_REPEAT(KEY_DOWN)) {
     if (CURR_STATE.fg_y_offset > MIN_Y_VAL) {
       CURR_STATE.fg_y_offset--;
       dirty = true;
     }
   }
-  if (keypad_keypressed(KEY_UP)) {
+  if (KEY_DOWN_OR_REPEAT(KEY_UP)) {
     if (CURR_STATE.fg_y_offset < MAX_Y_VAL) {
       CURR_STATE.fg_y_offset++;
       dirty = true;
     }
   }
-  if (keypad_keypressed(KEY_LEFT)) {
+  if (KEY_DOWN_OR_REPEAT(KEY_LEFT)) {
     if (CURR_STATE.fg_x_offset > MIN_X_VAL) {
       CURR_STATE.fg_x_offset--;
       dirty = true;
     }
   }
-  if (keypad_keypressed(KEY_RIGHT)) {
+  if (KEY_DOWN_OR_REPEAT(KEY_RIGHT)) {
     if (CURR_STATE.fg_x_offset < MAX_X_VAL) {
       CURR_STATE.fg_x_offset++;
       dirty = true;

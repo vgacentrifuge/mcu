@@ -13,7 +13,7 @@ void fpga_spi_init() {}
 void fpga_spi_send(uint8_t *data, uint8_t len) {
   fprintf(stderr, "Sent to FPGA:");
   for (int i = 0; i < len; i++)
-    fprintf(stderr, " 0x%2X", data[i]);
+    fprintf(stderr, " 0x%02X", data[i]);
   fprintf(stderr, "\n");
   usage_light = BLINK_TIME;
   total_bytes_sent += len;
@@ -40,7 +40,7 @@ void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg) {
   fpga_spi_send(data, 2);
 }
 
-void fpga_spi_sendcmd_u16(cmd_type_t cmd, int16_t arg) {
+void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg) {
   uint8_t arg1 = ((uint16_t)arg) >> 8;
   uint8_t arg2 = (uint8_t)arg;
   uint8_t data[3] = {cmd, arg1, arg2};

@@ -27,12 +27,12 @@ void fpga_spi_sendcmd(cmd_type_t cmd) {
 
 void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg) {
   uint8_t data[2] = { cmd, arg };
-  fpga_spi_send(&data, 2);
+  fpga_spi_send(data, 2);
 }
 
 void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg) {
   uint8_t arg1 = arg >> 8;
   uint8_t arg2 = (uint8_t) arg;
   uint8_t data[3] = { cmd, arg1, arg2 };
-  fpga_spi_send(&data, 3);
+  fpga_spi_send(data, 3);
 }

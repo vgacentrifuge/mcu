@@ -144,7 +144,7 @@ void DFR_autoscroll();
  *  @brief Allows us to fill the first 8 CGRAM locations
  *     with custom characters
  */
-void DFR_customSymbol(uint8_t, uint8_t[]);
+void DFR_customSymbol(uint8_t, const uint8_t[]);
 void DFR_setCursor(uint8_t, uint8_t);
 
 /*!

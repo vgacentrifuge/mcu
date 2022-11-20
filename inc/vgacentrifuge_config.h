@@ -1,0 +1,16 @@
+#pragma once
+
+#define PIXEL_CLOCK 4000 //40MHz
+
+// In pixels
+#define HORIZONTAL_ACTIVE 800
+#define HORIZONTAL_BLANKING 256
+#define HORIZONTAL_SYNC_OFFSET 40 // From blanking to HSYNC = front porch
+#define HORIZONTAL_SYNC_WIDTH 128
+#define HORIZONTAL_TOTAL (HORIZONTAL_ACTIVE+HORIZONTAL_BLANKING)
+
+// In Lines
+#define VERTICAL_ACTIVE 600
+#define VERTICAL_BLANKING 28
+#define VERTICAL_SYNC_OFFSET 1 // From blanking to VSYNC = front porch
+#define VERTICAL_SYNC_WIDTH 4

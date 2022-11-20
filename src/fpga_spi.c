@@ -31,8 +31,13 @@ void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg) {
 }
 
 void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg) {
-  uint8_t arg1 = arg >> 8;
-  uint8_t arg2 = (uint8_t) arg;
+  uint8_t arg1 = (arg >> 8) & 0xFF;
+  uint8_t arg2 = arg & 0xFF;
   uint8_t data[3] = { cmd, arg1, arg2 };
   fpga_spi_send(data, 3);
+}
+
+void fpga_spi_sendimageline(uint8_t *data, uint16_t width) {
+  data[0] = CMD_FG_IMG_UPLOAD;
+  fpga_spi_send(data, 3+width*2);
 }

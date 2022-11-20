@@ -28,17 +28,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "debug.h"
+#include "vgacentrifuge_config.h"
 
 #define I2C sl_i2cspm_i2c1
 
 // We store I2C addresses as 8-bit, with the LSB being changed for R/W (1/0)
 #define ADC1_ADDRESS 0b10111000
 #define ADC2_ADDRESS 0b10111010
-
-// For SVGA 800x600 @ 60.317Hz, taken from the chart in the datasheet
-// Can also be seen on http://tinyvga.com/vga-timing/800x600@60Hz
-#define PIXELS_PER_LINE 1056
-#define HSYNC_OUTPUT_PIXEL_WIDTH 128
 
 void configure_adc(uint8_t address);
 
@@ -73,8 +69,8 @@ void write_register(uint8_t address, uint8_t reg, uint8_t value) {
 void configure_adc(uint8_t address) {
   // See ADC datasheet: https://www.ti.com/lit/ds/symlink/tvp7002.pdf
 
-  write_register(address, 0x01, (PIXELS_PER_LINE>>4)&0xFF); // pixels per line [11:4]
-  write_register(address, 0x02, (PIXELS_PER_LINE<<4)&0xFF); // pixels per line [3:0] into reg[7:4]
+  write_register(address, 0x01, (HORIZONTAL_TOTAL>>4)&0xFF); // pixels per line [11:4]
+  write_register(address, 0x02, (HORIZONTAL_TOTAL<<4)&0xFF); // pixels per line [3:0] into reg[7:4]
 
   // Should be changed if PCLK > 70MHz
   write_register(address, 0x03, 0b01101000); // Sets pixel clock range and charge pump current setting
@@ -84,7 +80,7 @@ void configure_adc(uint8_t address) {
   write_register(address, 0x05, 0x06); // clamp start
   write_register(address, 0x06, 0x10); // clamp width
 
-  write_register(address, 0x07, HSYNC_OUTPUT_PIXEL_WIDTH); // HSYNC output pixel width
+  write_register(address, 0x07, HORIZONTAL_SYNC_WIDTH); // HSYNC output pixel width
 
   // Coarse (analog) and fine (digital) configuration
   write_register(address, 0x08, 0); // Blue fine gain control

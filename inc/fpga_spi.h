@@ -28,4 +28,10 @@ void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg);
 
 void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg);
 
+// Takes in a buffer like so
+// byte 0: Reserved
+// bytes 1-2: Big endian line number
+// Next width*2 bytes: pixel values in (5,6,5)-bit RGB
+void fpga_spi_sendimageline(uint8_t *data, uint16_t width);
+
 void fpga_spi_receive(uint8_t *buffer, uint8_t len);

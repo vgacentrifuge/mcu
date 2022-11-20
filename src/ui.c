@@ -4,36 +4,50 @@
 #include "debug.h"
 #include "ddc_data.h"
 #include "state.h"
+#include "image.h"
 #include <stdio.h>
 
 enum {
   UI_TRANSITION, // Lets the lcd freeze before switching mode
   UI_MIXING, // The default mixing view
   UI_OPTIONS, // The menu
+  UI_IMAGE_UPLOAD, // Uploading an image
 };
 
 static int ui_state;
 
-static int ui_state;
+static void ui_open_transition(int frames, void (*callback)());
+static void ui_open_mixing();
+static void ui_open_options();
+static void ui_open_image_upload();
 
 enum {
   PLAY_SYMBOL_INDEX = 0,
   PAUSE_SYMBOL_INDEX = 1,
   IMG_SYMBOL_INDEX = 2,
 
-  TRANS100_SYMBOL_INDEX = 3,
-  TRANS75_SYMBOL_INDEX = 4,
+  TRANS0_SYMBOL_INDEX = 3,
+  TRANS25_SYMBOL_INDEX = 4,
   TRANS50_SYMBOL_INDEX = 5,
-  TRANS25_SYMBOL_INDEX = 6,
+  TRANS75_SYMBOL_INDEX = 6,
 };
-const uint8_t PLAY_SYMBOL[8]  = { 0b10000, 0b11000, 0b11100, 0b11110, 0b11110, 0b11100, 0b11000, 0b10000 };
-const uint8_t PAUSE_SYMBOL[8] = { 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011 };
-const uint8_t IMG_SYMBOL[8]   = { 0b00000, 0b11111, 0b11001, 0b10001, 0b10111, 0b11111, 0b11111, 0b11111 };
+static const uint8_t PLAY_SYMBOL[8]  = { 0b00000, 0b10000, 0b11100, 0b11111, 0b11111, 0b11100, 0b10000, 0b00000 };
+static const uint8_t PAUSE_SYMBOL[8] = { 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011 };
+static const uint8_t IMG_SYMBOL[8]   = { 0b00000, 0b11111, 0b11001, 0b10001, 0b10111, 0b11111, 0b11111, 0b11111 };
+static const uint8_t TRANS0_SYMBOL[8]  = { 0b00000, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b10000 };
+static const uint8_t TRANS25_SYMBOL[8] = { 0b00000, 0b10101, 0b11111, 0b01010, 0b11111, 0b10101, 0b11111, 0b10000 };
+static const uint8_t TRANS50_SYMBOL[8] = { 0b00000, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10000 };
+static const uint8_t TRANS75_SYMBOL[8] = { 0b00000, 0b01010, 0b00000, 0b10101, 0b00000, 0b01010, 0b00000, 0b10000 };
 
 void ui_init(void) {
   lcd_custom_symbol(PLAY_SYMBOL_INDEX, PLAY_SYMBOL);
   lcd_custom_symbol(PAUSE_SYMBOL_INDEX, PAUSE_SYMBOL);
   lcd_custom_symbol(IMG_SYMBOL_INDEX, IMG_SYMBOL);
+
+  lcd_custom_symbol(TRANS0_SYMBOL_INDEX, TRANS0_SYMBOL);
+  lcd_custom_symbol(TRANS25_SYMBOL_INDEX, TRANS25_SYMBOL);
+  lcd_custom_symbol(TRANS50_SYMBOL_INDEX, TRANS50_SYMBOL);
+  lcd_custom_symbol(TRANS75_SYMBOL_INDEX, TRANS75_SYMBOL);
 
   for (uint8_t i = 0; i < NUM_MIXING_STATES; i++)
     mixing_states[i] = INITIAL_STATE;
@@ -47,18 +61,18 @@ void ui_init(void) {
 static int ui_transition_frames_left;
 static void (*ui_transition_callback)();
 
-void ui_open_transition(int frames, void (*callback)()) {
+static void ui_open_transition(int frames, void (*callback)()) {
   ui_state = UI_TRANSITION;
   ui_transition_frames_left = frames;
   ui_transition_callback = callback;
 }
 
-void ui_update_transition() {
+static void ui_update_transition() {
   if (ui_transition_frames_left-- <= 0)
     ui_transition_callback();
 }
 
-void ui_open_mixing() {
+static void ui_open_mixing() {
   ui_state = UI_MIXING;
 
   lcd_clear();
@@ -72,18 +86,18 @@ void ui_open_mixing() {
   char buff[16];
 
   lcd_set_cursor(0, 1);
-  switch (CURR_STATE.fg_image_state) {
+  switch (CURR_STATE.image_path_hash) {
     case FG_IS_LIVE:   lcd_write(PLAY_SYMBOL_INDEX); break;
     case FG_IS_FROZEN: lcd_write(PAUSE_SYMBOL_INDEX); break;
-    case FG_IS_IMAGE:  lcd_write(IMG_SYMBOL_INDEX); break;
+    default:           lcd_write(IMG_SYMBOL_INDEX); break;
   }
 
   lcd_set_cursor(6, 0);
   switch (CURR_STATE.fg_transparency) {
-    case FG_TRANSPARENCY_0: lcd_print(";"); break;
-    case FG_TRANSPARENCY_25: lcd_print(":"); break;
-    case FG_TRANSPARENCY_50: lcd_print(","); break;
-    case FG_TRANSPARENCY_75: lcd_print("."); break;
+    case FG_TRANSPARENCY_0:  lcd_write(TRANS0_SYMBOL_INDEX); break;
+    case FG_TRANSPARENCY_25: lcd_write(TRANS25_SYMBOL_INDEX); break;
+    case FG_TRANSPARENCY_50: lcd_write(TRANS50_SYMBOL_INDEX); break;
+    case FG_TRANSPARENCY_75: lcd_write(TRANS75_SYMBOL_INDEX); break;
   }
 
   lcd_set_cursor(8, 0);
@@ -117,7 +131,7 @@ void ui_open_mixing() {
     && ((was_down_frames > REPEAT_DELAY && (was_down_frames - REPEAT_DELAY) % REPEAT_PERIOD == 0) \
     || was_down_frames == 1))
 
-void ui_update_mixing() {
+static void ui_update_mixing() {
   bool dirty = false;
   int was_down_frames;
   if (KEY_DOWN_OR_REPEAT(KEY_DOWN)) {
@@ -211,18 +225,30 @@ void ui_update_mixing() {
   }
 
   if (dirty) {
-    state_send_changes();
-    ui_open_mixing();
+    int res = state_send_changes();
+    switch(res) {
+      case STATE_SEND_OK:
+        ui_open_mixing();
+        break;
+      case STATE_SEND_IMAGE_STARTED:
+        ui_open_image_upload();
+        break;
+      case STATE_SEND_IMAGE_FAILED:
+        lcd_clear();
+        lcd_print("> IMAGE ERROR! <");
+        ui_open_transition(60, &ui_open_mixing);
+        break;
+    }
   }
 }
 
-void ui_open_options() {
+static void ui_open_options() {
   ui_state = UI_OPTIONS;
   lcd_clear();
   lcd_print("      MENU      ");
 }
 
-void ui_update_options() {
+static void ui_update_options() {
   if (keypad_keypressed(KEY_MENU))
     ui_open_mixing();
 
@@ -240,6 +266,35 @@ void ui_update_options() {
   }
 }
 
+static void ui_open_image_upload() {
+  ui_state = UI_IMAGE_UPLOAD;
+  lcd_clear();
+  lcd_print("Uploading image");
+}
+
+static void ui_update_image_upload() {
+  uint16_t uploaded, total;
+  int res = image_upload_next_lines(6, &uploaded, &total);
+
+  switch(res) {
+    case IMAGE_UPLOAD_DONE:
+      ui_open_mixing();
+      return;
+    case IMAGE_UPLOAD_ONGOING: {
+      char buf[20];
+      snprintf(buf, sizeof(buf), " Lines: %3d/%3d ", uploaded%1000, total%1000);
+      lcd_set_cursor(0, 1);
+      lcd_print(buf);
+      return;
+    }
+    case IMAGE_UPLOAD_ERROR:
+      lcd_clear();
+      lcd_print("> IMAGE ERROR! <");
+      ui_open_transition(60, &ui_open_mixing);
+      return;
+  }
+}
+
 void ui_update() {
   switch (ui_state) {
   case UI_TRANSITION:
@@ -250,6 +305,9 @@ void ui_update() {
     break;
   case UI_OPTIONS:
     ui_update_options();
+    break;
+  case UI_IMAGE_UPLOAD:
+    ui_update_image_upload();
     break;
   }
 }

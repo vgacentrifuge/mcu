@@ -13,17 +13,7 @@ extern I2CSPM_Init_TypeDef init_eeprom2;
 // We use the 8-bit version of the address
 #define EEPROM_ADDRESS 0b10100000
 
-#define PIXEL_CLOCK 4000 //40MHz
-// In pixels
-#define HORIZONTAL_ACTIVE 800
-#define HORIZONTAL_BLANKING 256
-#define HORIZONTAL_SYNC_OFFSET 40 // From blanking to HSYNC = front porch
-#define HORIZONTAL_SYNC_WIDTH 128
-// In Lines
-#define VERTICAL_ACTIVE 600
-#define VERTICAL_BLANKING 28
-#define VERTICAL_SYNC_OFFSET 1 // From blanking to VSYNC = front porch
-#define VERTICAL_SYNC_WIDTH 4
+#include "vgacentrifuge_config.h"
 
 // In mm
 #define HORIZONTAL_IMAGE_SIZE 320

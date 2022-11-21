@@ -18,6 +18,17 @@
 #include "ui.h"
 
 /***************************************************************************//**
+ * The volatile boolean wait is used to make sure frames have a minimum delay
+ ******************************************************************************/
+static sl_sleeptimer_timer_handle_t delay_timer;
+static volatile bool wait = false;
+static void next_frame_callback(sl_sleeptimer_timer_handle_t *handle, void* data) {
+  (void) handle;
+  (void) data;
+  wait = false;
+}
+
+/***************************************************************************//**
  * Initialize application.
  ******************************************************************************/
 void app_init(void)
@@ -32,6 +43,12 @@ void app_init(void)
   ui_init();
   board_io_set_led0(0);
   debug_flush();
+
+  // Use a periodic timer to set wait=false, allowing next frame to run
+  sl_sleeptimer_start_periodic_timer(&delay_timer,
+                                     sl_sleeptimer_ms_to_tick(16),
+                                     &next_frame_callback,
+                                     NULL, 0, 0);
 }
 
 /***************************************************************************//**
@@ -39,11 +56,12 @@ void app_init(void)
  ******************************************************************************/
 void app_process_action(void)
 {
+  // Wait until next frame is allowed to start
+  while(wait) {};
+  wait = true;
+
   board_io_sample();
   keypad_sample();
-
   ui_update();
-
-  sl_sleeptimer_delay_millisecond(16); // About 60 frames a second
   debug_flush();
 }

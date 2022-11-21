@@ -25,7 +25,7 @@
 
 // <o SL_SPIDRV_FPGA_BITRATE> SPI bitrate
 // <i> Default: 1000000
-#define SL_SPIDRV_FPGA_BITRATE           1000000
+#define SL_SPIDRV_FPGA_BITRATE           5000000
 
 // <o SL_SPIDRV_FPGA_FRAME_LENGTH> SPI frame length <4-16>
 // <i> Default: 8

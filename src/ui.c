@@ -174,14 +174,14 @@ static void ui_open_mixing() {
 #define MIN_Y_VAL -600
 
 #define REPEAT_DELAY 15
-#define REPEAT_PERIOD 5
+#define REPEAT_PERIOD 2
 #define KEY_DOWN_OR_REPEAT(KEY)                                                \
   (keypad_keydown(KEY, &was_down_frames) &&                                    \
    ((was_down_frames > REPEAT_DELAY &&                                         \
      (was_down_frames - REPEAT_DELAY) % REPEAT_PERIOD == 0) ||                 \
     was_down_frames == 1))
 // How many frames a mode key must be held to enable source select
-#define MODE_HOLD_THRESHOLD 60
+#define MODE_HOLD_THRESHOLD 30
 
 static void ui_update_mixing() {
   bool dirty = false;

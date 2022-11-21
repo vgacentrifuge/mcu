@@ -98,8 +98,9 @@ int image_upload_next_lines(uint16_t lines, uint16_t *uploaded, uint16_t *total)
   for(int i = 0; i < lines; i++) {
 
     // first load the line from the file into the buffer
-    // round the read length up to eat any BMP row padding
-    uint16_t read_length = (image_width*3+3) % 4;
+    uint16_t read_length = image_width*3;
+    // round the read length up to multiple of 4 to eat any BMP row padding
+    read_length += (4 - read_length % 4) % 4;
     UINT bytes_read;
     int res = f_read(&image_file_handle, pixel_buffer, read_length, &bytes_read);
     IM_ASSERT(res == FR_OK && read_length == bytes_read);
@@ -107,18 +108,20 @@ int image_upload_next_lines(uint16_t lines, uint16_t *uploaded, uint16_t *total)
     // Now turn the 3-byte BGR colors into 16-bit, with red as MSBs
     for(int x = 0; x < image_width; x++) {
         uint16_t color16 = 0;
-        color16 |= (pixel_buffer[3*x+2]<<8) & 0b1111100000000000; //red
-        color16 |= (pixel_buffer[3*x+1]<<3) & 0b0000011111100000; //green
-        color16 |= (pixel_buffer[3*x+0]>>3) & 0b0000000000011111; //blue
+        color16 |= ((uint16_t)pixel_buffer[3*x+2]<<8) & 0b1111100000000000; //red
+        color16 |= ((uint16_t)pixel_buffer[3*x+1]<<3) & 0b0000011111100000; //green
+        color16 |= ((uint16_t)pixel_buffer[3*x+0]>>3) & 0b0000000000011111; //blue
 
         // But the 16 bit color back in the buffer, MSB first
         pixel_buffer[2*x] = (color16>>8) & 0xFF;
         pixel_buffer[2*x+1] = color16 & 0xFF;
     }
 
+    // Due to the way BMP is stored, we start at the bottom
+    uint16_t line_number_from_bottom = image_height-1-sent_lines;
     // Use bytes [1 ... 2] to pass the line number
-    send_buffer[1] = (sent_lines>>8) & 0xFF;
-    send_buffer[2] = sent_lines & 0xFF;
+    send_buffer[1] = (line_number_from_bottom>>8) & 0xFF;
+    send_buffer[2] = line_number_from_bottom & 0xFF;
     fpga_spi_sendimageline(send_buffer, image_width);
 
     sent_lines++;

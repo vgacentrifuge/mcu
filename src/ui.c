@@ -1,20 +1,20 @@
 #include "ui.h"
-#include "lcd.h"
-#include "keypad.h"
-#include "debug.h"
 #include "ddc_data.h"
-#include "state.h"
+#include "debug.h"
 #include "image.h"
-#include <stdio.h>
+#include "keypad.h"
+#include "lcd.h"
+#include "state.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 enum {
-  UI_TRANSITION, // Lets the lcd freeze before switching mode
-  UI_MIXING, // The default mixing view
-  UI_OPTIONS, // The menu
+  UI_TRANSITION,    // Lets the lcd freeze before switching mode
+  UI_MIXING,        // The default mixing view
+  UI_OPTIONS,       // The menu
   UI_SOURCE_SELECT, // Picking source from a list
-  UI_IMAGE_UPLOAD, // Uploading an image
+  UI_IMAGE_UPLOAD,  // Uploading an image
 };
 
 static int ui_state;
@@ -36,15 +36,22 @@ enum {
   TRANS50_SYMBOL_INDEX = 5,
   TRANS75_SYMBOL_INDEX = 6,
 };
-static const uint8_t PLAY_SYMBOL[8]  = { 0b00000, 0b10000, 0b11100, 0b11111, 0b11111, 0b11100, 0b10000, 0b00000 };
-static const uint8_t PAUSE_SYMBOL[8] = { 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011 };
-static const uint8_t IMG_SYMBOL[8]   = { 0b00000, 0b11111, 0b11001, 0b10001, 0b10111, 0b11111, 0b11111, 0b11111 };
+static const uint8_t PLAY_SYMBOL[8] = {0b00000, 0b10000, 0b11100, 0b11111,
+                                       0b11111, 0b11100, 0b10000, 0b00000};
+static const uint8_t PAUSE_SYMBOL[8] = {0b11011, 0b11011, 0b11011, 0b11011,
+                                        0b11011, 0b11011, 0b11011, 0b11011};
+static const uint8_t IMG_SYMBOL[8] = {0b00000, 0b11111, 0b11001, 0b10001,
+                                      0b10111, 0b11111, 0b11111, 0b11111};
 
-static const uint8_t TRANS0_SYMBOL[8]  = { 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111 };
-static const uint8_t TRANS25_SYMBOL[8] = { 0b11111, 0b10101, 0b11111, 0b01010, 0b11111, 0b10101, 0b11111, 0b01010 };
-static const uint8_t TRANS50_SYMBOL[8] = { 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101 };
-static const uint8_t TRANS75_SYMBOL[8] = { 0b00000, 0b01010, 0b00000, 0b10101, 0b00000, 0b01010, 0b00000, 0b10101 };;
-
+static const uint8_t TRANS0_SYMBOL[8] = {0b11111, 0b11111, 0b11111, 0b11111,
+                                         0b11111, 0b11111, 0b11111, 0b11111};
+static const uint8_t TRANS25_SYMBOL[8] = {0b11111, 0b10101, 0b11111, 0b01010,
+                                          0b11111, 0b10101, 0b11111, 0b01010};
+static const uint8_t TRANS50_SYMBOL[8] = {0b01010, 0b10101, 0b01010, 0b10101,
+                                          0b01010, 0b10101, 0b01010, 0b10101};
+static const uint8_t TRANS75_SYMBOL[8] = {0b00000, 0b01010, 0b00000, 0b10101,
+                                          0b00000, 0b01010, 0b00000, 0b10101};
+;
 
 void ui_init(void) {
   lcd_custom_symbol(PLAY_SYMBOL_INDEX, PLAY_SYMBOL);
@@ -70,18 +77,18 @@ void ui_init(void) {
 // Unless an image upload is starting / failed to start
 void ui_handle_state_changes() {
   int res = state_send_changes();
-  switch(res) {
-    case STATE_SEND_OK:
-      ui_open_mixing();
-      break;
-    case STATE_SEND_IMAGE_STARTED:
-      ui_open_image_upload();
-      break;
-    case STATE_SEND_IMAGE_FAILED:
-      lcd_clear();
-      lcd_print("> IMAGE ERROR! <");
-      ui_open_transition(60, &ui_open_mixing);
-      break;
+  switch (res) {
+  case STATE_SEND_OK:
+    ui_open_mixing();
+    break;
+  case STATE_SEND_IMAGE_STARTED:
+    ui_open_image_upload();
+    break;
+  case STATE_SEND_IMAGE_FAILED:
+    lcd_clear();
+    lcd_print("> IMAGE ERROR! <");
+    ui_open_transition(60, &ui_open_mixing);
+    break;
   }
 }
 
@@ -100,35 +107,54 @@ static void ui_update_transition() {
 
 static void ui_open_mixing() {
   ui_state = UI_MIXING;
-  char buff[LCD_COLUMNS+1];
+  char buff[LCD_COLUMNS + 1];
 
   lcd_clear();
   lcd_set_cursor(0, 0);
   switch (CURR_STATE.fg_blend_mode) {
-    case FG_BLEND_NONE: lcd_print("NONE  "); break;
-    case FG_BLEND_OVERLAY: lcd_print("OVRLAY"); break;
-    case FG_BLEND_CHROMA: lcd_print("CHROMA"); break;
+  case FG_BLEND_NONE:
+    lcd_print("NONE  ");
+    break;
+  case FG_BLEND_OVERLAY:
+    lcd_print("OVRLAY");
+    break;
+  case FG_BLEND_CHROMA:
+    lcd_print("CHROMA");
+    break;
   }
 
   lcd_set_cursor(0, 1);
-  lcd_write('0'+current_mixing_state);
+  lcd_write('0' + current_mixing_state);
   switch (CURR_STATE.image_path_hash) {
-    case FG_IS_LIVE:   lcd_write(PLAY_SYMBOL_INDEX); break;
-    case FG_IS_FROZEN: lcd_write(PAUSE_SYMBOL_INDEX); break;
-    default:           lcd_write(IMG_SYMBOL_INDEX); break;
+  case FG_IS_LIVE:
+    lcd_write(PLAY_SYMBOL_INDEX);
+    break;
+  case FG_IS_FROZEN:
+    lcd_write(PAUSE_SYMBOL_INDEX);
+    break;
+  default:
+    lcd_write(IMG_SYMBOL_INDEX);
+    break;
   }
 
   const uint8_t TRANS_SYMBOLS[] = {TRANS0_SYMBOL_INDEX, TRANS25_SYMBOL_INDEX,
-                           TRANS50_SYMBOL_INDEX, TRANS75_SYMBOL_INDEX, ' '};
+                                   TRANS50_SYMBOL_INDEX, TRANS75_SYMBOL_INDEX,
+                                   ' '};
   lcd_set_cursor(7, 0);
   lcd_write(TRANS_SYMBOLS[CURR_STATE.fg_transparency / 2]);
   lcd_write(TRANS_SYMBOLS[(CURR_STATE.fg_transparency + 1) / 2]);
 
   lcd_set_cursor(3, 1);
   switch (CURR_STATE.fg_scale) {
-    case FG_SCALE_100: lcd_print("SC100%"); break;
-    case FG_SCALE_50:  lcd_print("SC 50%"); break;
-    case FG_SCALE_25:  lcd_print("SC 25%"); break;
+  case FG_SCALE_100:
+    lcd_print("SC100%");
+    break;
+  case FG_SCALE_50:
+    lcd_print("SC 50%");
+    break;
+  case FG_SCALE_25:
+    lcd_print("SC 25%");
+    break;
   }
 
   lcd_set_cursor(10, 0);
@@ -139,17 +165,18 @@ static void ui_open_mixing() {
   lcd_print(buff);
 }
 
-#define MAX_X_VAL  800
+#define MAX_X_VAL 800
 #define MIN_X_VAL -800
-#define MAX_Y_VAL  600
+#define MAX_Y_VAL 600
 #define MIN_Y_VAL -600
 
 #define REPEAT_DELAY 15
 #define REPEAT_PERIOD 5
-#define KEY_DOWN_OR_REPEAT(KEY) \
-    (keypad_keydown(KEY, &was_down_frames) \
-    && ((was_down_frames > REPEAT_DELAY && (was_down_frames - REPEAT_DELAY) % REPEAT_PERIOD == 0) \
-    || was_down_frames == 1))
+#define KEY_DOWN_OR_REPEAT(KEY)                                                \
+  (keypad_keydown(KEY, &was_down_frames) &&                                    \
+   ((was_down_frames > REPEAT_DELAY &&                                         \
+     (was_down_frames - REPEAT_DELAY) % REPEAT_PERIOD == 0) ||                 \
+    was_down_frames == 1))
 // How many frames a mode key must be held to enable source select
 #define MODE_HOLD_THRESHOLD 60
 
@@ -190,22 +217,24 @@ static void ui_update_mixing() {
     ui_open_options();
   }
 
-  if (keypad_keyreleased(KEY_CHROMA_KEY, NULL)) {
+  if (keypad_keyreleased(KEY_CHROMA, NULL)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
     source_select_live_input();
     dirty = true;
   }
-  if (keypad_keydown(KEY_CHROMA_KEY, &was_down_frames) && was_down_frames >= MODE_HOLD_THRESHOLD) {
+  if (keypad_keydown(KEY_CHROMA, &was_down_frames) &&
+      was_down_frames >= MODE_HOLD_THRESHOLD) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
     ui_open_source_select();
     return;
   }
-  if (keypad_keyreleased(KEY_OVERLAY_KEY, NULL)) {
+  if (keypad_keyreleased(KEY_OVERLAY, NULL)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
     source_select_live_input();
     dirty = true;
   }
-  if (keypad_keydown(KEY_OVERLAY_KEY, &was_down_frames) && was_down_frames >= MODE_HOLD_THRESHOLD) {
+  if (keypad_keydown(KEY_OVERLAY, &was_down_frames) &&
+      was_down_frames >= MODE_HOLD_THRESHOLD) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
     ui_open_source_select();
     return;
@@ -253,7 +282,7 @@ static void ui_update_mixing() {
     dirty = true;
   }
   if (keypad_keypressed(KEY_PSTATE)) {
-    current_mixing_state += (NUM_MIXING_STATES-1);
+    current_mixing_state += (NUM_MIXING_STATES - 1);
     current_mixing_state %= NUM_MIXING_STATES;
     dirty = true;
   }
@@ -263,30 +292,30 @@ static void ui_update_mixing() {
 }
 
 #define MAX_MENU_ENTRIES 100
-static char* menu_title;
-static char* menu_entries[MAX_MENU_ENTRIES];
+static char *menu_title;
+static char *menu_entries[MAX_MENU_ENTRIES];
 static int menu_entry_count;
 static int menu_selected_entry;
 
 // Starts a menu titled with title
 // The pointer must continue to be valid for the lifetime of the menu
-void ui_menuing_begin(char* title) {
+void ui_menuing_begin(char *title) {
   menu_title = title;
   menu_entry_count = 0;
   menu_selected_entry = 0;
   lcd_clear();
   lcd_print(title);
-  lcd_set_cursor(0,1);
+  lcd_set_cursor(0, 1);
   lcd_write('>');
 }
 
 // Adds an option to the generic menu
 // The option text pointer must stay valid for the lifetime of the menu
-void ui_menuing_add_option(char* option) {
+void ui_menuing_add_option(char *option) {
   if (menu_entry_count >= MAX_MENU_ENTRIES) {
-      debug_print("Menu overflow: ");
-      debug_println(option);
-      return;
+    debug_print("Menu overflow: ");
+    debug_println(option);
+    return;
   }
   menu_entries[menu_entry_count++] = option;
   // Funny hack, when we start updating, we will overflow by 1,
@@ -298,21 +327,23 @@ void ui_menuing_add_option(char* option) {
 // Returns true once an option is selected.
 // Use selected_option to get the index of the selected option.
 // It will be -1 if the menu was cancelled.
-bool ui_menuing_update(int *selected_option, char** selected_text) {
+bool ui_menuing_update(int *selected_option, char **selected_text) {
   if (keypad_keypressed(KEY_MENU) || keypad_keypressed(KEY_LEFT)) {
     *selected_option = -1;
     return true;
   }
 
   // If the menu has no entries, our only option is cancel
-  if (menu_entry_count == 0) return false;
+  if (menu_entry_count == 0)
+    return false;
   int prev_menu_entry = menu_selected_entry;
 
   if (keypad_keypressed(KEY_DOWN))
     menu_selected_entry++;
   if (keypad_keypressed(KEY_UP))
     menu_selected_entry--;
-  menu_selected_entry = (menu_selected_entry + menu_entry_count) % menu_entry_count;
+  menu_selected_entry =
+      (menu_selected_entry + menu_entry_count) % menu_entry_count;
 
   if (keypad_keypressed(KEY_RIGHT)) {
     *selected_option = menu_selected_entry;
@@ -323,8 +354,9 @@ bool ui_menuing_update(int *selected_option, char** selected_text) {
   // Redraw the selected entry
   if (menu_selected_entry != prev_menu_entry) {
     char buffer[LCD_COLUMNS];
-    snprintf(buffer, sizeof(buffer), "%-15.15s", menu_entries[menu_selected_entry]);
-    lcd_set_cursor(1,1);
+    snprintf(buffer, sizeof(buffer), "%-15.15s",
+             menu_entries[menu_selected_entry]);
+    lcd_set_cursor(1, 1);
     lcd_print(buffer);
   }
 
@@ -372,12 +404,12 @@ static void source_select_frozen_input() {
 
 // Changes the current state to use the given image path
 // Does not send the changes to the FPGA
-static void source_select_image(char* path_name) {
+static void source_select_image(char *path_name) {
   uint16_t hash = 2;
   int i = 0;
-  for(; i < STATE_IMAGE_PATH_LEN && path_name[i] != '\0'; i++) {
-      CURR_STATE.image_path[i] = path_name[i];
-      hash = hash * 97 + path_name[i];
+  for (; i < STATE_IMAGE_PATH_LEN && path_name[i] != '\0'; i++) {
+    CURR_STATE.image_path[i] = path_name[i];
+    hash = hash * 97 + path_name[i];
   }
   CURR_STATE.image_path[i] = '\0';
   CURR_STATE.image_path_hash = hash;
@@ -398,9 +430,10 @@ static void ui_open_source_select() {
 
 static void ui_update_source_select() {
   int selected_option;
-  char* selected_name;
+  char *selected_name;
   if (ui_menuing_update(&selected_option, &selected_name)) {
-    if (selected_option == -1){} // Menu button pressed, cancels
+    if (selected_option == -1) {
+    }                              // Menu button pressed, cancels
     else if (selected_option == 0) // Live input
       source_select_live_input();
     else if (selected_option == 1) // Frozen input
@@ -421,22 +454,23 @@ static void ui_update_image_upload() {
   uint16_t uploaded, total;
   int res = image_upload_next_lines(6, &uploaded, &total);
 
-  switch(res) {
-    case IMAGE_UPLOAD_DONE:
-      ui_open_mixing();
-      return;
-    case IMAGE_UPLOAD_ONGOING: {
-      char buf[20];
-      snprintf(buf, sizeof(buf), " Lines: %3d/%3d ", uploaded%1000, total%1000);
-      lcd_set_cursor(0, 1);
-      lcd_print(buf);
-      return;
-    }
-    case IMAGE_UPLOAD_ERROR:
-      lcd_clear();
-      lcd_print("> IMAGE ERROR! <");
-      ui_open_transition(60, &ui_open_mixing);
-      return;
+  switch (res) {
+  case IMAGE_UPLOAD_DONE:
+    ui_open_mixing();
+    return;
+  case IMAGE_UPLOAD_ONGOING: {
+    char buf[20];
+    snprintf(buf, sizeof(buf), " Lines: %3d/%3d ", uploaded % 1000,
+             total % 1000);
+    lcd_set_cursor(0, 1);
+    lcd_print(buf);
+    return;
+  }
+  case IMAGE_UPLOAD_ERROR:
+    lcd_clear();
+    lcd_print("> IMAGE ERROR! <");
+    ui_open_transition(60, &ui_open_mixing);
+    return;
   }
 }
 

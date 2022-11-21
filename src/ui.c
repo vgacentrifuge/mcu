@@ -15,6 +15,7 @@ enum {
   UI_OPTIONS,       // The menu
   UI_SOURCE_SELECT, // Picking source from a list
   UI_IMAGE_UPLOAD,  // Uploading an image
+  UI_STATE_SELECT,  // Picking a state from a list
 };
 
 static int ui_state;
@@ -25,6 +26,8 @@ static void ui_open_options();
 static void source_select_live_input();
 static void ui_open_source_select();
 static void ui_open_image_upload();
+static void ui_open_state_select();
+static void ui_update_state_select();
 
 enum {
   PLAY_SYMBOL_INDEX = 0,
@@ -287,6 +290,17 @@ static void ui_update_mixing() {
     dirty = true;
   }
 
+  if (keypad_keydown(KEY_NSTATE, &was_down_frames) &&
+      was_down_frames >= MODE_HOLD_THRESHOLD) {
+    ui_open_state_select();
+    return;
+  }
+  if (keypad_keydown(KEY_PSTATE, &was_down_frames) &&
+      was_down_frames >= MODE_HOLD_THRESHOLD) {
+    ui_open_state_select();
+    return;
+  }
+
   if (dirty)
     ui_handle_state_changes();
 }
@@ -474,6 +488,27 @@ static void ui_update_image_upload() {
   }
 }
 
+static void ui_open_state_select() {
+  ui_state = UI_STATE_SELECT;
+  ui_menuing_begin("State select:");
+  for (int i = 0; i < NUM_MIXING_STATES; i++) {
+    char option[8];
+    snprintf(option, sizeof(option), "State %u", i);
+    ui_menuing_add_option(option);
+  }
+}
+
+static void ui_update_state_select() {
+  int selected_option;
+  char *selected_text;
+  if (ui_menuing_update(&selected_option, &selected_text)) {
+    if (selected_option >= 0) {
+      current_mixing_state = selected_option % NUM_MIXING_STATES;
+      ui_handle_state_changes();
+    }
+  }
+}
+
 void ui_update() {
   switch (ui_state) {
   case UI_TRANSITION:
@@ -491,5 +526,7 @@ void ui_update() {
   case UI_IMAGE_UPLOAD:
     ui_update_image_upload();
     break;
+  case UI_STATE_SELECT:
+    ui_update_state_select();
   }
 }

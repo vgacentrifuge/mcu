@@ -5,6 +5,7 @@
 #include "keypad.h"
 #include "lcd.h"
 #include "state.h"
+#include "sd_card.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,7 +28,6 @@ static void source_select_live_input();
 static void ui_open_source_select();
 static void ui_open_image_upload();
 static void ui_open_state_select();
-static void ui_update_state_select();
 
 enum {
   PLAY_SYMBOL_INDEX = 0,
@@ -279,24 +279,20 @@ static void ui_update_mixing() {
     }
   }
 
-  if (keypad_keypressed(KEY_NSTATE)) {
+  if (keypad_keyreleased(KEY_NSTATE, NULL)) {
     current_mixing_state++;
     current_mixing_state %= NUM_MIXING_STATES;
     dirty = true;
   }
-  if (keypad_keypressed(KEY_PSTATE)) {
+  if (keypad_keyreleased(KEY_PSTATE, NULL)) {
     current_mixing_state += (NUM_MIXING_STATES - 1);
     current_mixing_state %= NUM_MIXING_STATES;
     dirty = true;
   }
-
-  if (keypad_keydown(KEY_NSTATE, &was_down_frames) &&
-      was_down_frames >= MODE_HOLD_THRESHOLD) {
-    ui_open_state_select();
-    return;
-  }
-  if (keypad_keydown(KEY_PSTATE, &was_down_frames) &&
-      was_down_frames >= MODE_HOLD_THRESHOLD) {
+  if ((keypad_keydown(KEY_NSTATE, &was_down_frames)
+       && was_down_frames >= MODE_HOLD_THRESHOLD)
+   || (keypad_keydown(KEY_PSTATE, &was_down_frames)
+       && was_down_frames >= MODE_HOLD_THRESHOLD)) {
     ui_open_state_select();
     return;
   }
@@ -429,17 +425,21 @@ static void source_select_image(char *path_name) {
   CURR_STATE.image_path_hash = hash;
 }
 
+#define MAX_SD_CARD_ENTRIES 64
 static void ui_open_source_select() {
   ui_state = UI_SOURCE_SELECT;
   ui_menuing_begin("Source select:");
   ui_menuing_add_option("Live from VGA1");
   ui_menuing_add_option("Frozen");
-  ui_menuing_add_option("image1.bmp");
-  ui_menuing_add_option("image2.bmp");
-  ui_menuing_add_option("image3.bmp");
-  ui_menuing_add_option("image4.bmp");
-  ui_menuing_add_option("image5.bmp");
-  ui_menuing_add_option("image6.bmp");
+  if (sd_card_is_mounted()) {
+    static direntry_t entries[MAX_SD_CARD_ENTRIES];
+    int entries_read;
+    if (sd_card_list_files("/", entries, MAX_SD_CARD_ENTRIES, &entries_read) == 0) {
+      for (int i = 0; i < entries_read; i++) {
+        ui_menuing_add_option(entries[i].fname);
+      }
+    }
+  }
 }
 
 static void ui_update_source_select() {
@@ -488,24 +488,52 @@ static void ui_update_image_upload() {
   }
 }
 
+static int state_select_selection;
 static void ui_open_state_select() {
   ui_state = UI_STATE_SELECT;
-  ui_menuing_begin("State select:");
-  for (int i = 0; i < NUM_MIXING_STATES; i++) {
-    char option[8];
-    snprintf(option, sizeof(option), "State %u", i);
-    ui_menuing_add_option(option);
-  }
+  lcd_clear();
+  lcd_print("Select state");
+  lcd_set_cursor(0, 1);
+  lcd_print("<P            N>");
+  // We overflow on purpose to trigger a re-draw first update
+  state_select_selection = current_mixing_state + NUM_MIXING_STATES;
 }
 
 static void ui_update_state_select() {
-  int selected_option;
-  char *selected_text;
-  if (ui_menuing_update(&selected_option, &selected_text)) {
-    if (selected_option >= 0) {
-      current_mixing_state = selected_option % NUM_MIXING_STATES;
-      ui_handle_state_changes();
-    }
+  int last_state_select_selection = state_select_selection;
+
+  if (keypad_keypressed(KEY_PSTATE))
+    state_select_selection--;
+  if (keypad_keypressed(KEY_NSTATE))
+    state_select_selection++;
+  state_select_selection = (state_select_selection + NUM_MIXING_STATES) % NUM_MIXING_STATES;
+
+  // Hold reset to trigger copy the existsing state to the new one
+  int was_down_time;
+  if (keypad_keydown(KEY_RESET_ALL, &was_down_time) && was_down_time >= MODE_HOLD_THRESHOLD) {
+    // Copy CURR_STATE into the new slot
+    if (current_mixing_state != state_select_selection)
+      memcpy(&mixing_states[state_select_selection], &CURR_STATE, sizeof(CURR_STATE));
+    current_mixing_state = state_select_selection;
+    ui_handle_state_changes();
+    return;
+  }
+
+  if (keypad_keyreleased(KEY_RESET_ALL, NULL)) {
+    current_mixing_state = state_select_selection;
+    ui_handle_state_changes();
+    return;
+  }
+
+  if (keypad_keypressed(KEY_MENU)) {
+    // abort state change
+    ui_handle_state_changes();
+    return;
+  }
+
+  if (state_select_selection != last_state_select_selection) {
+    lcd_set_cursor(LCD_COLUMNS/2, 1);
+    lcd_write('0' + state_select_selection);
   }
 }
 
@@ -528,5 +556,6 @@ void ui_update() {
     break;
   case UI_STATE_SELECT:
     ui_update_state_select();
+    break;
   }
 }

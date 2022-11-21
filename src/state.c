@@ -3,6 +3,7 @@
 #include "image.h"
 #include <stdbool.h>
 #include <string.h>
+#include "debug.h"
 #include "vgacentrifuge_config.h"
 
 State mixing_states[NUM_MIXING_STATES];

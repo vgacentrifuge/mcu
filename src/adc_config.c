@@ -129,7 +129,7 @@ void configure_adc(uint8_t address) {
 
   // Since RGB is 18 cycles delayed, there is a 18-5=13 cycle head start to the hsync signal
   write_register(address, 0x21, 13); //HSOUT Output Start delay  (in pixel clock cycles). + 5 extra cycles
-  write_register(address, 0x35, 0x10); //VSYNC Alignment (offset between leading HSYNC and leading VSYNC) //Default 0x10
+  write_register(address, 0x35, 0x30); //VSYNC Alignment (offset between leading HSYNC and leading VSYNC) //Default 0x10
   write_register(address, 0x36, 0); // Don't enable any sync bypass (Default=0)
 
   const uint8_t MAC_EN = 0; // No "Macrovision", thank you

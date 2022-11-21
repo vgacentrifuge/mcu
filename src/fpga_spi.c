@@ -1,19 +1,35 @@
 #include "fpga_spi.h"
 #include "state.h"
+#include "sl_spidrv_fpga_config.h"
 #include "sl_spidrv_instances.h"
 #include "debug.h"
+#include "em_gpio.h"
 
-void fpga_spi_init() {}
+// Remember that SPI CS is active low
+#define CS_HIGH() GPIO_PinOutSet(SL_SPIDRV_FPGA_CS_PORT, SL_SPIDRV_FPGA_CS_PIN)
+#define CS_LOW() GPIO_PinOutClear(SL_SPIDRV_FPGA_CS_PORT, SL_SPIDRV_FPGA_CS_PIN)
 
-void fpga_spi_send(uint8_t *data, uint8_t len) {
-  Ecode_t ret = SPIDRV_MTransmitB(sl_spidrv_fpga_handle, data, len);
-  if (ret != ECODE_OK) {
-    debug_print("fpga_spi_send() failed: ");
-    debug_printintln(ret);
-  }
+void fpga_spi_init() {
+  GPIO_PinModeSet(SL_SPIDRV_FPGA_CS_PORT, SL_SPIDRV_FPGA_CS_PIN, gpioModePushPull, 1);
 }
 
-void fpga_spi_receive(uint8_t *buffer, uint8_t len) {
+void fpga_spi_send(uint8_t *data, int len) {
+  CS_LOW();
+  // In case the message is longer than the DMA allows
+  for(int i = 0; i < len; i+= DMADRV_MAX_XFER_COUNT) {
+    int send_len = len-i;
+    if (send_len > DMADRV_MAX_XFER_COUNT)
+      send_len = DMADRV_MAX_XFER_COUNT;
+    Ecode_t ret = SPIDRV_MTransmitB(sl_spidrv_fpga_handle, data+i, send_len);
+    if (ret != ECODE_OK) {
+      debug_print("fpga_spi_send() failed: ");
+      debug_printintln(ret);
+    }
+  }
+  CS_HIGH();
+}
+
+void fpga_spi_receive(uint8_t *buffer, int len) {
   Ecode_t ret = SPIDRV_MReceiveB(sl_spidrv_fpga_handle, buffer, len);
   if (ret != ECODE_OK) {
     debug_print("fpga_spi_receive() failed: ");

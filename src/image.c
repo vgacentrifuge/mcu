@@ -76,6 +76,7 @@ int image_open_for_upload(char *path) {
 
   // Seek to the first byte of the pixel array
   f_lseek(&image_file_handle, header.image_offset);
+  sent_lines = 0;
 
   return IMAGE_UPLOAD_ONGOING;
 }
@@ -104,7 +105,7 @@ int image_upload_next_lines(uint16_t lines, uint16_t *uploaded, uint16_t *total)
     IM_ASSERT(res == FR_OK && read_length == bytes_read);
 
     // Now turn the 3-byte BGR colors into 16-bit, with red as MSBs
-    for(int x = 0; x < image_width; i++) {
+    for(int x = 0; x < image_width; x++) {
         uint16_t color16 = 0;
         color16 |= (pixel_buffer[3*x+2]<<8) & 0b1111100000000000; //red
         color16 |= (pixel_buffer[3*x+1]<<3) & 0b0000011111100000; //green

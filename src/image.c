@@ -1,6 +1,7 @@
 #include "image.h"
 #include "fatfs/ff.h"
 #include "fpga_spi.h"
+#include "debug.h"
 #include <stdbool.h>
 #include "vgacentrifuge_config.h"
 
@@ -35,11 +36,13 @@ static uint16_t image_height;
 static uint16_t sent_lines;
 
 // If the clause is false, closes any open file descriptor, and returns error
-#define IM_ASSERT(clause) do{if(!(clause)) { \
-    if(has_open_file_handle) \
-      f_close(&image_file_handle); \
-    has_open_file_handle = false; \
-    return IMAGE_UPLOAD_ERROR; \
+#define IM_ASSERT(clause) do{if(!(clause)) {          \
+    debug_print("image.c IM_ASSERT failed on line "); \
+    debug_printintln(__LINE__);                       \
+    if(has_open_file_handle)                          \
+      f_close(&image_file_handle);                    \
+    has_open_file_handle = false;                     \
+    return IMAGE_UPLOAD_ERROR;                        \
   }}while(false)
 
 int image_open_for_upload(char *path) {

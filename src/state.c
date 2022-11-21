@@ -29,11 +29,7 @@ int state_send_changes() {
     // We want to be displaying an image
     if (CURR_STATE.image_path_hash != last_sent_state.image_path_hash) {
       // The image is new! No matter the outcome, we reset the clipping
-      CURR_STATE.fg_clipping_left = 0;
-      CURR_STATE.fg_clipping_right= 0;
-      CURR_STATE.fg_clipping_bottom = 0;
-      CURR_STATE.fg_clipping_top = 0;
-
+      STATE_RESET_CLIPPING(CURR_STATE);
       // Open the image on the SD card to start the upload.
       ret = image_open_for_upload(CURR_STATE.image_path);
       switch(ret) {

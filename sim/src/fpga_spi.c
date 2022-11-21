@@ -33,6 +33,7 @@ void fpga_spi_draw() {
   EndMode2D();
 }
 
+// The rest of this file is copied verbatim from the real source
 void fpga_spi_sendcmd(cmd_type_t cmd) { fpga_spi_send(&cmd, 1); }
 
 void fpga_spi_sendcmd_u8(cmd_type_t cmd, uint8_t arg) {
@@ -47,3 +48,7 @@ void fpga_spi_sendcmd_u16(cmd_type_t cmd, uint16_t arg) {
   fpga_spi_send(data, 3);
 }
 
+void fpga_spi_sendimageline(uint8_t *data, uint16_t width) {
+  data[0] = CMD_FG_IMG_UPLOAD;
+  fpga_spi_send(data, 3+width*2);
+}

@@ -19,3 +19,23 @@ int sd_card_list_files(const char* path, direntry_t *entries,
     *entries_read = 0;
     return 0;
 }
+
+#include "fatfs/ff.h"
+FRESULT f_open (
+	FIL* fp,			/* Pointer to the blank file object */
+	const TCHAR* path,	/* Pointer to the file name */
+	BYTE mode			/* Access mode and open mode flags */
+) {return FR_OK;}
+FRESULT f_read (
+	FIL* fp, 	/* Open file to be read */
+	void* buff,	/* Data buffer to store the read data */
+	UINT btr,	/* Number of bytes to read */
+	UINT* br	/* Number of bytes read */
+) {return FR_OK;}
+FRESULT f_lseek (
+	FIL* fp,		/* Pointer to the file object */
+	FSIZE_t ofs		/* File pointer from top of file */
+) {return FR_OK;}
+FRESULT f_close (
+	FIL* fp		/* Open file to be closed */
+) {return FR_OK;}

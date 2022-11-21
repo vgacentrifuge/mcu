@@ -5,12 +5,13 @@
 
 #include "fatfs/ffconf.h"
 
-typedef struct {
 #if FF_USE_LFN >= 1
-  char fname[FF_LFN_BUF + 1]; //based on ff.h's FILINFO struct
+#define FILENAME_MAX_LEN (FF_LFN_BUF + 1) //based on ff.h's FILINFO struct
 #else
-  char fname[12 + 1];
+#define FILENAME_MAX_LEN (12 + 1)
 #endif
+typedef struct {
+  char fname[FILENAME_MAX_LEN];
   uint32_t fsize;
   bool is_dir;
 } direntry_t;

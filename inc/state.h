@@ -40,14 +40,8 @@ enum fg_scale {
   FG_SCALE_MAX = 2
 };
 
-// Transparency 0 means fully opaque
-enum fg_transparency {
-  FG_TRANSPARENCY_0 = 0,
-  FG_TRANSPARENCY_25 = 1,
-  FG_TRANSPARENCY_50 = 2,
-  FG_TRANSPARENCY_75 = 3,
-  FG_TRANSPARENCY_MAX = 3
-};
+// We have 3 bits, with 7 meaning the foreground is 12.5% visible
+#define FG_TRANSPARANCY_MAX 7
 
 // If no image is currently being displayed, image_path_hash instead is one of these
 enum fg_image_state {
@@ -62,7 +56,7 @@ enum fg_image_state {
     .fg_scale = FG_SCALE_100,         \
     .fg_x_offset = 0,                 \
     .fg_y_offset = 0,                 \
-    .fg_transparency = FG_TRANSPARENCY_0, \
+    .fg_transparency = 0,             \
     .fg_clipping_left = 0,            \
     .fg_clipping_right = 0,           \
     .fg_clipping_top= 0,              \
@@ -70,6 +64,13 @@ enum fg_image_state {
     .image_path_hash = FG_IS_LIVE,    \
     .image_path[0 ... STATE_IMAGE_PATH_LEN] = 0 \
 }
+#define STATE_RESET_CLIPPING(State) do{    \
+    (State).fg_clipping_left = 0;     \
+    (State).fg_clipping_right = 0;    \
+    (State).fg_clipping_top = 0;      \
+    (State).fg_clipping_bottom = 0;   \
+    } while(false)
+
 
 #define NUM_MIXING_STATES 10
 extern State mixing_states[NUM_MIXING_STATES];

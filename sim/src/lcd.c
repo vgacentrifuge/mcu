@@ -10,10 +10,17 @@ static uint8_t line, col;
 
 void lcd_init() {}
 
+void lcd_write(uint8_t char_num) {
+    if (char_num < 8)
+        data[line][col++] = '0'+char_num;
+    else
+        data[line][col++] = char_num;
+}
+
 void lcd_print(char* str) {
     for(;*str != '\0'; str++) {
         if(line >= 0 && line < LINES && col >= 0 && col < COLS)
-            data[line][col++] = *str;
+            lcd_write(*str);
         else
             fprintf(stderr, "LCD overflow: %c\n", *str);
     }
@@ -58,8 +65,4 @@ void lcd_draw() {
 void lcd_custom_symbol(uint8_t char_num, uint8_t const* rows) {
     (void) char_num;
     (void) rows;
-}
-
-void lcd_write(uint8_t char_num) {
-    data[line][col++] = '0'+char_num;
 }

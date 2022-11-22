@@ -71,6 +71,7 @@ int state_send_changes() {
   SYNC_U16(fg_clipping_top, CMD_FG_CLIP_TOP);
   SYNC_U16(fg_clipping_right, CMD_FG_CLIP_RIGHT);
   SYNC_U16(fg_clipping_bottom, CMD_FG_CLIP_BOTTOM);
+  SYNC_U16(chroma_key_cfg, CMD_CHROMA_KEY_CFG);
 
   // Copy all data except the image path, since it is hashed either way
   memcpy(&last_sent_state, &CURR_STATE, sizeof(CURR_STATE)-sizeof(CURR_STATE.image_path));
@@ -79,6 +80,6 @@ int state_send_changes() {
 }
 
 void state_send_reset() {
-  memset(&last_sent_state, 0, sizeof(last_sent_state));
+  last_sent_state = INITIAL_STATE;
   fpga_spi_sendcmd(CMD_RESET);
 }

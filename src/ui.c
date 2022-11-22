@@ -419,6 +419,7 @@ static void ui_update_options() {
 
 static int clipping_menu_state = CLIP_MENU_LEFT;
 static void ui_open_clipping() {
+  ui_state = UI_CLIPPING_MENU;
   lcd_clear();
   lcd_print("Clipping ");
 
@@ -459,6 +460,10 @@ static void ui_update_clipping() {
   bool dirty = false;
   int was_down_frames;
 
+  if (keypad_keypressed(KEY_MENU)) {
+    ui_open_transition(0, &ui_open_options);
+    return;
+  }
   if (KEY_DOWN_OR_REPEAT(KEY_LEFT)) {
     if (clipping_menu_state == CLIP_MENU_LEFT && CURR_STATE.fg_clipping_left > 0) {
       CURR_STATE.fg_clipping_left--;
@@ -482,7 +487,7 @@ static void ui_update_clipping() {
   if (KEY_DOWN_OR_REPEAT(KEY_UP)) {
     if (clipping_menu_state == CLIP_MENU_TOP && CURR_STATE.fg_clipping_top > 0) {
       CURR_STATE.fg_clipping_top--;
-    } else if (clipping_menu_state == CLIP_MENU_BOTTOM && CURR_STATE.fg_clipping_bottom < MAX_X_VAL) {
+    } else if (clipping_menu_state == CLIP_MENU_BOTTOM && CURR_STATE.fg_clipping_bottom < MAX_Y_VAL) {
       CURR_STATE.fg_clipping_bottom++;
     } else {
       clipping_menu_state = CLIP_MENU_TOP;
@@ -492,7 +497,7 @@ static void ui_update_clipping() {
   if (KEY_DOWN_OR_REPEAT(KEY_DOWN)) {
     if (clipping_menu_state == CLIP_MENU_BOTTOM && CURR_STATE.fg_clipping_bottom > 0) {
       CURR_STATE.fg_clipping_bottom--;
-    } else if (clipping_menu_state == CLIP_MENU_TOP && CURR_STATE.fg_clipping_top < MAX_X_VAL) {
+    } else if (clipping_menu_state == CLIP_MENU_TOP && CURR_STATE.fg_clipping_top < MAX_Y_VAL) {
       CURR_STATE.fg_clipping_top++;
     } else {
       clipping_menu_state = CLIP_MENU_BOTTOM;

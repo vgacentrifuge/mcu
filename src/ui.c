@@ -14,6 +14,7 @@ enum {
   UI_TRANSITION,    // Lets the lcd freeze before switching mode
   UI_MIXING,        // The default mixing view
   UI_OPTIONS,       // The menu
+  UI_CLIPPING_MENU, // The clipping menu
   UI_SOURCE_SELECT, // Picking source from a list
   UI_IMAGE_UPLOAD,  // Uploading an image
   UI_STATE_SELECT,  // Picking a state from a list
@@ -24,6 +25,7 @@ static int ui_state;
 static void ui_open_transition(int frames, void (*callback)());
 static void ui_open_mixing();
 static void ui_open_options();
+static void ui_open_clipping();
 static void source_select_live_input();
 static void ui_open_source_select();
 static void ui_open_image_upload();
@@ -54,7 +56,14 @@ static const uint8_t TRANS50_SYMBOL[8] = {0b01010, 0b10101, 0b01010, 0b10101,
                                           0b01010, 0b10101, 0b01010, 0b10101};
 static const uint8_t TRANS75_SYMBOL[8] = {0b00000, 0b01010, 0b00000, 0b10101,
                                           0b00000, 0b01010, 0b00000, 0b10101};
-;
+
+// The different clipping menu states
+enum {
+  CLIP_MENU_LEFT,
+  CLIP_MENU_RIGHT,
+  CLIP_MENU_TOP,
+  CLIP_MENU_BOTTOM,
+};
 
 void ui_init(void) {
   lcd_custom_symbol(PLAY_SYMBOL_INDEX, PLAY_SYMBOL);
@@ -75,14 +84,19 @@ void ui_init(void) {
   ui_open_transition(0, &ui_open_mixing);
 }
 
-// Call once the state has been changed to handle it
-// Will by default open the mixing mode afterwards,
-// Unless an image upload is starting / failed to start
+// Call once the state has been changed to handle it.
+// Will by default open the mixing mode afterwards.
+// Unless an image upload is starting / failed to start,
+// or we are in the clipping menu.
 void ui_handle_state_changes() {
   int res = state_send_changes();
   switch (res) {
   case STATE_SEND_OK:
-    ui_open_mixing();
+    if (ui_state == UI_CLIPPING_MENU) {
+      ui_open_clipping();
+    } else {
+      ui_open_mixing();
+    }
     break;
   case STATE_SEND_IMAGE_STARTED:
     ui_open_image_upload();
@@ -375,25 +389,119 @@ bool ui_menuing_update(int *selected_option, char **selected_text) {
 
 static void ui_open_options() {
   ui_state = UI_OPTIONS;
-  lcd_clear();
-  lcd_print("      MENU      ");
+  ui_menuing_begin("Menu:");
+  ui_menuing_add_option("Clipping");
+  ui_menuing_add_option("Flash EEPROM1");
+  ui_menuing_add_option("Flash EEPROM2");
 }
 
 static void ui_update_options() {
-  if (keypad_keypressed(KEY_MENU))
-    ui_open_mixing();
-
-  if (keypad_keypressed(KEY_INDEX(0, 0))) {
-    flash_ddc_eeprom(DDC_EEPROM1);
-    lcd_clear();
-    lcd_print("Flashed EEPROM1!");
-    ui_open_transition(60, &ui_open_mixing);
+  int selected_option;
+  char *selected_name;
+  if (ui_menuing_update(&selected_option, &selected_name)) {
+    if (selected_option == 0) {
+      ui_open_transition(0, &ui_open_clipping);
+    } else if (selected_option == 1) {
+      flash_ddc_eeprom(DDC_EEPROM1);
+      lcd_clear();
+      lcd_print("Flashed EEPROM1!");
+      ui_open_transition(60, &ui_open_mixing);
+    } else if (selected_option == 2) {
+      flash_ddc_eeprom(DDC_EEPROM2);
+      lcd_clear();
+      lcd_print("Flashed EEPROM2!");
+      ui_open_transition(60, &ui_open_mixing);
+    } else {
+      ui_open_transition(0, &ui_open_mixing);
+    }
   }
-  if (keypad_keypressed(KEY_INDEX(1, 0))) {
-    flash_ddc_eeprom(DDC_EEPROM2);
-    lcd_clear();
-    lcd_print("Flashed EEPROM2!");
-    ui_open_transition(60, &ui_open_mixing);
+}
+
+static int clipping_menu_state = CLIP_MENU_LEFT;
+static void ui_open_clipping() {
+  lcd_clear();
+  lcd_print("Clipping ");
+
+  char *name = NULL;
+  uint16_t clip_val = 0;
+  switch (clipping_menu_state) {
+    case CLIP_MENU_LEFT:
+      name = "left";
+      clip_val = CURR_STATE.fg_clipping_left;
+      break;
+    case CLIP_MENU_RIGHT:
+      name = "right";
+      clip_val = CURR_STATE.fg_clipping_right;
+      break;
+    case CLIP_MENU_TOP:
+      name = "top";
+      clip_val = CURR_STATE.fg_clipping_top;
+      break;
+    case CLIP_MENU_BOTTOM:
+      name = "bottom";
+      clip_val = CURR_STATE.fg_clipping_bottom;
+      break;
+  }
+
+  lcd_print(name);
+  lcd_print(":");
+
+  lcd_set_cursor(0, 1);
+  char buf[LCD_COLUMNS + 1];
+  if (clipping_menu_state == CLIP_MENU_LEFT || clipping_menu_state == CLIP_MENU_RIGHT) {
+    snprintf(buf, sizeof(buf), "< %+05d > ^T Bv", clip_val);
+  } else {
+    snprintf(buf, sizeof(buf), "^ %+05d v <L R>", clip_val);
+  }
+}
+
+static void ui_update_clipping() {
+  bool dirty = false;
+  int was_down_frames;
+
+  if (KEY_DOWN_OR_REPEAT(KEY_LEFT)) {
+    if (clipping_menu_state == CLIP_MENU_LEFT && CURR_STATE.fg_clipping_left > 0) {
+      CURR_STATE.fg_clipping_left--;
+    } else if (clipping_menu_state == CLIP_MENU_RIGHT && CURR_STATE.fg_clipping_right < MAX_X_VAL) {
+      CURR_STATE.fg_clipping_right++;
+    } else {
+      clipping_menu_state = CLIP_MENU_LEFT;
+    }
+    dirty = true;
+  }
+  if (KEY_DOWN_OR_REPEAT(KEY_RIGHT)) {
+    if (clipping_menu_state == CLIP_MENU_RIGHT && CURR_STATE.fg_clipping_right > 0) {
+      CURR_STATE.fg_clipping_right--;
+    } else if (clipping_menu_state == CLIP_MENU_LEFT && CURR_STATE.fg_clipping_left < MAX_X_VAL) {
+      CURR_STATE.fg_clipping_left++;
+    } else {
+      clipping_menu_state = CLIP_MENU_RIGHT;
+    }
+    dirty = true;
+  }
+  if (KEY_DOWN_OR_REPEAT(KEY_UP)) {
+    if (clipping_menu_state == CLIP_MENU_TOP && CURR_STATE.fg_clipping_top > 0) {
+      CURR_STATE.fg_clipping_top--;
+    } else if (clipping_menu_state == CLIP_MENU_BOTTOM && CURR_STATE.fg_clipping_bottom < MAX_X_VAL) {
+      CURR_STATE.fg_clipping_bottom++;
+    } else {
+      clipping_menu_state = CLIP_MENU_TOP;
+    }
+    dirty = true;
+  }
+  if (KEY_DOWN_OR_REPEAT(KEY_DOWN)) {
+    if (clipping_menu_state == CLIP_MENU_BOTTOM && CURR_STATE.fg_clipping_bottom > 0) {
+      CURR_STATE.fg_clipping_bottom--;
+    } else if (clipping_menu_state == CLIP_MENU_TOP && CURR_STATE.fg_clipping_top < MAX_X_VAL) {
+      CURR_STATE.fg_clipping_top++;
+    } else {
+      clipping_menu_state = CLIP_MENU_BOTTOM;
+    }
+    dirty = true;
+  }
+
+  if (dirty) {
+    ui_handle_state_changes();
   }
 }
 
@@ -547,6 +655,9 @@ void ui_update() {
     break;
   case UI_OPTIONS:
     ui_update_options();
+    break;
+  case UI_CLIPPING_MENU:
+    ui_update_clipping();
     break;
   case UI_SOURCE_SELECT:
     ui_update_source_select();

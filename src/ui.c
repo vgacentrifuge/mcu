@@ -15,6 +15,7 @@ enum {
   UI_MIXING,        // The default mixing view
   UI_OPTIONS,       // The menu
   UI_CLIPPING_MENU, // The clipping menu
+  UI_CHROMA_KEY_CFG,  // Chroma key config menu
   UI_SOURCE_SELECT, // Picking source from a list
   UI_IMAGE_UPLOAD,  // Uploading an image
   UI_STATE_SELECT,  // Picking a state from a list
@@ -26,6 +27,7 @@ static void ui_open_transition(int frames, void (*callback)());
 static void ui_open_mixing();
 static void ui_open_options();
 static void ui_open_clipping();
+static void ui_open_chroma_key_cfg();
 static void source_select_live_input();
 static void ui_open_source_select();
 static void ui_open_image_upload();
@@ -65,6 +67,14 @@ enum {
   CLIP_MENU_BOTTOM,
 };
 
+// Chroma key config states
+enum {
+  CHROMA_KEY_CFG_RED = 0,
+  CHROMA_KEY_CFG_GREEN = 1,
+  CHROMA_KEY_CFG_BLUE = 2,
+};
+#define NUM_CHROMA_KEY_CFG_STATES 3
+
 void ui_init(void) {
   lcd_custom_symbol(PLAY_SYMBOL_INDEX, PLAY_SYMBOL);
   lcd_custom_symbol(PAUSE_SYMBOL_INDEX, PAUSE_SYMBOL);
@@ -94,6 +104,8 @@ void ui_handle_state_changes() {
   case STATE_SEND_OK:
     if (ui_state == UI_CLIPPING_MENU) {
       ui_open_clipping();
+    } else if (ui_state == UI_CHROMA_KEY_CFG) {
+      ui_open_chroma_key_cfg();
     } else {
       ui_open_mixing();
     }
@@ -391,6 +403,7 @@ static void ui_open_options() {
   ui_state = UI_OPTIONS;
   ui_menuing_begin("Menu:");
   ui_menuing_add_option("Clipping");
+  ui_menuing_add_option("Chroma Key cfg");
   ui_menuing_add_option("Flash EEPROM1");
   ui_menuing_add_option("Flash EEPROM2");
 }
@@ -399,20 +412,28 @@ static void ui_update_options() {
   int selected_option;
   char *selected_name;
   if (ui_menuing_update(&selected_option, &selected_name)) {
-    if (selected_option == 0) {
-      ui_open_transition(0, &ui_open_clipping);
-    } else if (selected_option == 1) {
-      flash_ddc_eeprom(DDC_EEPROM1);
-      lcd_clear();
-      lcd_print("Flashed EEPROM1!");
-      ui_open_transition(60, &ui_open_mixing);
-    } else if (selected_option == 2) {
-      flash_ddc_eeprom(DDC_EEPROM2);
-      lcd_clear();
-      lcd_print("Flashed EEPROM2!");
-      ui_open_transition(60, &ui_open_mixing);
-    } else {
-      ui_open_transition(0, &ui_open_mixing);
+    switch (selected_option) {
+      case 0:
+        ui_open_transition(0, &ui_open_clipping);
+        break;
+      case 1:
+        ui_open_transition(0, &ui_open_chroma_key_cfg);
+        break;
+      case 2:
+        flash_ddc_eeprom(DDC_EEPROM1);
+        lcd_clear();
+        lcd_print("Flashed EEPROM1!");
+        ui_open_transition(60, &ui_open_mixing);
+        break;
+      case 3:
+        flash_ddc_eeprom(DDC_EEPROM2);
+        lcd_clear();
+        lcd_print("Flashed EEPROM2!");
+        ui_open_transition(60, &ui_open_mixing);
+        break;
+      default:
+        ui_open_transition(0, &ui_open_mixing);
+        break;
     }
   }
 }
@@ -465,10 +486,7 @@ static void ui_update_clipping() {
     return;
   }
   if (keypad_keypressed(KEY_RESET_ALL)) {
-    CURR_STATE.fg_clipping_left = 0;
-    CURR_STATE.fg_clipping_right = 0;
-    CURR_STATE.fg_clipping_top = 0;
-    CURR_STATE.fg_clipping_bottom = 0;
+    STATE_RESET_CLIPPING(CURR_STATE);
     dirty = true;
   }
   if (keypad_keypressed(KEY_RESET_OFFSET)) {
@@ -525,6 +543,109 @@ static void ui_update_clipping() {
       CURR_STATE.fg_clipping_top++;
     } else {
       clipping_menu_state = CLIP_MENU_BOTTOM;
+    }
+    dirty = true;
+  }
+
+  if (dirty) {
+    ui_handle_state_changes();
+  }
+}
+
+#define CHROMA_KEY_RED_MASK 0xF800
+#define CHROMA_KEY_GREEN_MASK 0x7E0
+#define CHROMA_KEY_BLUE_MASK 0x1F
+static int chroma_key_cfg_color = CHROMA_KEY_CFG_RED;
+static void ui_open_chroma_key_cfg() {
+  ui_state = UI_CHROMA_KEY_CFG;
+  lcd_clear();
+  lcd_print("Chroma Key cfg:");
+
+  char buf[LCD_COLUMNS + 1];
+  snprintf(buf, sizeof(buf), " R%02d  G%02d  B%02d",
+      (CURR_STATE.chroma_key_cfg & CHROMA_KEY_RED_MASK) >> 11,
+      (CURR_STATE.chroma_key_cfg & CHROMA_KEY_GREEN_MASK) >> 5,
+      CURR_STATE.chroma_key_cfg & CHROMA_KEY_BLUE_MASK);
+  lcd_set_cursor(0, 1);
+  lcd_print(buf);
+
+  switch (chroma_key_cfg_color) {
+    case CHROMA_KEY_CFG_RED:
+      lcd_set_cursor(0, 1);
+      lcd_write('>');
+      break;
+    case CHROMA_KEY_CFG_GREEN:
+      lcd_set_cursor(5, 1);
+      lcd_write('>');
+      break;
+    case CHROMA_KEY_CFG_BLUE:
+      lcd_set_cursor(10, 1);
+      lcd_write('>');
+      break;
+  }
+}
+
+static void ui_update_chroma_key_cfg() {
+  bool dirty = false;
+  int was_down_frames;
+
+  if (keypad_keypressed(KEY_MENU)) {
+    ui_open_transition(0, &ui_open_options);
+    return;
+  }
+  if (keypad_keypressed(KEY_RESET_ALL)) {
+    CURR_STATE.chroma_key_cfg = CHROMA_KEY_CFG_DEFAULT;
+    dirty = true;
+  }
+  if (keypad_keypressed(KEY_LEFT)) {
+    chroma_key_cfg_color--;
+    if (chroma_key_cfg_color < 0) {
+      chroma_key_cfg_color = NUM_CHROMA_KEY_CFG_STATES - 1;
+    }
+    dirty = true;
+  }
+  if (keypad_keypressed(KEY_RIGHT)) {
+    chroma_key_cfg_color++;
+    chroma_key_cfg_color %= NUM_CHROMA_KEY_CFG_STATES;
+    dirty = true;
+  }
+  if (KEY_DOWN_OR_REPEAT(KEY_UP)) {
+    switch (chroma_key_cfg_color) {
+      case CHROMA_KEY_CFG_RED:
+        if (((CURR_STATE.chroma_key_cfg & CHROMA_KEY_RED_MASK) >> 11) < 31) {
+          CURR_STATE.chroma_key_cfg += (1 << 11);
+        }
+        break;
+      case CHROMA_KEY_CFG_GREEN:
+        if (((CURR_STATE.chroma_key_cfg & CHROMA_KEY_GREEN_MASK) >> 5) < 63) {
+          CURR_STATE.chroma_key_cfg += (1 << 5);
+        }
+        break;
+      case CHROMA_KEY_CFG_BLUE:
+        if ((CURR_STATE.chroma_key_cfg & CHROMA_KEY_BLUE_MASK) < 31) {
+          CURR_STATE.chroma_key_cfg += 1;
+        }
+        break;
+    }
+    dirty = true;
+  }
+  if (KEY_DOWN_OR_REPEAT(KEY_DOWN)) {
+    switch (chroma_key_cfg_color) {
+      case CHROMA_KEY_CFG_RED:
+        if (((CURR_STATE.chroma_key_cfg & CHROMA_KEY_RED_MASK) >> 11) > 0) {
+          CURR_STATE.chroma_key_cfg -= (1 << 11);
+        }
+        break;
+      case CHROMA_KEY_CFG_GREEN:
+        if (((CURR_STATE.chroma_key_cfg & CHROMA_KEY_GREEN_MASK) >> 5) > 0) {
+          CURR_STATE.chroma_key_cfg -= (1 << 5);
+        }
+        break;
+      case CHROMA_KEY_CFG_BLUE:
+        if ((CURR_STATE.chroma_key_cfg & CHROMA_KEY_BLUE_MASK) > 0) {
+          CURR_STATE.chroma_key_cfg -= 1;
+        }
+        break;
     }
     dirty = true;
   }
@@ -687,6 +808,9 @@ void ui_update() {
     break;
   case UI_CLIPPING_MENU:
     ui_update_clipping();
+    break;
+  case UI_CHROMA_KEY_CFG:
+    ui_update_chroma_key_cfg();
     break;
   case UI_SOURCE_SELECT:
     ui_update_source_select();

@@ -17,6 +17,8 @@ enum {
   CMD_FG_CLIP_BOTTOM = 0xA,
   CMD_FG_FREEZE = 0xB,
   CMD_FG_IMG_UPLOAD = 0xC,
+  CMD_FLIP_FG_BG = 0xD, // Currently unused
+  CMD_CHROMA_KEY_CFG = 0xE,
 };
 typedef uint8_t cmd_type_t;
 

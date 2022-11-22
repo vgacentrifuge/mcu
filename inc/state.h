@@ -16,6 +16,7 @@ typedef struct {
   uint16_t fg_clipping_right;
   uint16_t fg_clipping_top;
   uint16_t fg_clipping_bottom;
+  uint16_t chroma_key_cfg;
 
   // FG_LIVE means playing live, FG_FROZEN means frozen
   // Any other value is a 16 bit hash of the image_path
@@ -50,6 +51,8 @@ enum fg_image_state {
   FG_IS_IMAGE_HASH = 2, //And every value above it
 };
 
+#define CHROMA_KEY_CFG_DEFAULT 0b0010010110001100
+
 #define INITIAL_STATE (State){        \
     .fg_blend_mode = FG_BLEND_NONE,   \
     .fg_mode_flag = 0,                \
@@ -61,6 +64,7 @@ enum fg_image_state {
     .fg_clipping_right = 0,           \
     .fg_clipping_top= 0,              \
     .fg_clipping_bottom = 0,          \
+    .chroma_key_cfg = CHROMA_KEY_CFG_DEFAULT, \
     .image_path_hash = FG_IS_LIVE,    \
     .image_path[0 ... STATE_IMAGE_PATH_LEN] = 0 \
 }

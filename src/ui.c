@@ -464,6 +464,30 @@ static void ui_update_clipping() {
     ui_open_transition(0, &ui_open_options);
     return;
   }
+  if (keypad_keypressed(KEY_RESET_ALL)) {
+    CURR_STATE.fg_clipping_left = 0;
+    CURR_STATE.fg_clipping_right = 0;
+    CURR_STATE.fg_clipping_top = 0;
+    CURR_STATE.fg_clipping_bottom = 0;
+    dirty = true;
+  }
+  if (keypad_keypressed(KEY_RESET_OFFSET)) {
+    switch (clipping_menu_state) {
+      case CLIP_MENU_LEFT:
+        CURR_STATE.fg_clipping_left = 0;
+        break;
+      case CLIP_MENU_RIGHT:
+        CURR_STATE.fg_clipping_right = 0;
+        break;
+      case CLIP_MENU_TOP:
+        CURR_STATE.fg_clipping_top = 0;
+        break;
+      case CLIP_MENU_BOTTOM:
+        CURR_STATE.fg_clipping_bottom = 0;
+        break;
+    }
+    dirty = true;
+  }
   if (KEY_DOWN_OR_REPEAT(KEY_LEFT)) {
     if (clipping_menu_state == CLIP_MENU_LEFT && CURR_STATE.fg_clipping_left > 0) {
       CURR_STATE.fg_clipping_left--;

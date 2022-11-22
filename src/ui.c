@@ -248,7 +248,6 @@ static void ui_update_mixing() {
 
   if (keypad_keyreleased(KEY_CHROMA, NULL)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_CHROMA;
-    source_select_live_input();
     dirty = true;
   }
   if (keypad_keydown(KEY_CHROMA, &was_down_frames) &&
@@ -259,7 +258,6 @@ static void ui_update_mixing() {
   }
   if (keypad_keyreleased(KEY_OVERLAY, NULL)) {
     CURR_STATE.fg_blend_mode = FG_BLEND_OVERLAY;
-    source_select_live_input();
     dirty = true;
   }
   if (keypad_keydown(KEY_OVERLAY, &was_down_frames) &&

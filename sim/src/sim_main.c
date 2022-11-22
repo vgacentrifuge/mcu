@@ -23,7 +23,6 @@ int main(int argc, char **argv) {
     app_init();
 
     while(!WindowShouldClose()) {
-
         app_process_action();
 
         BeginDrawing();
